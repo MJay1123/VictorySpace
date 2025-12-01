@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.victoryspace.vics.vote.query.mapper.VoteQueryMapper">
+    <resultMap id="VoteResultMap"
+               type="com.victoryspace.vics.vote.query.dto.VoteQueryDTO">
+        <result property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="memberId" column="member_id"/>
+        <result property="content" column="content"/>
+        <result property="challengerId" column="challenger_id"/>
+        <result property="challengerContent" column="challenger_content"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="deletedAt" column="deleted_at"/>
+        <result property="duration" column="duration"/>
+        <result property="endedAt" column="ended_at"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="VoteResultMap">
+        SELECT id,
+               title,
+               member_id,
+               content,
+               challenger_id,
+               challenger_content,
+               created_at,
+               updated_at,
+               deleted_at,
+               duration,
+               ended_at
+        FROM vote
+    </select>
+
+    <select id="findById" resultMap="VoteResultMap">
+        SELECT id,
+               title,
+               member_id,
+               content,
+               challenger_id,
+               challenger_content,
+               created_at,
+               updated_at,
+               deleted_at,
+               duration,
+               ended_at
+        FROM vote
+        WHERE id = #{id}
+    </select>
+
+    <select id="findByMemberId" resultMap="VoteResultMap">
+        SELECT id,
+               title,
+               member_id,
+               content,
+               challenger_id,
+               challenger_content,
+               created_at,
+               updated_at,
+               deleted_at,
+               duration,
+               ended_at
+        FROM vote
+        WHERE member_id = #{memberId}
+    </select>
+
+    <select id="findByChallengerId" resultMap="VoteResultMap">
+        SELECT id,
+               title,
+               member_id,
+               content,
+               challenger_id,
+               challenger_content,
+               created_at,
+               updated_at,
+               deleted_at,
+               duration,
+               ended_at
+        FROM vote
+        WHERE challenger_id = #{challengerId}
+    </select>
+
+    <select id="search" resultMap="VoteResultMap">
+        SELECT v.*
+        FROM vote v
+        JOIN member m ON v.member_id = m.id
+        <where>
+            <if test="title != null and title != ''">
+                AND v.title LIKE CONCAT('%', #{title}, '%')
+            </if>
+            <if test="categoryId != null">
+                AND v.category_id = #{categoryId}
+            </if>
+            <if test="nickname != null and nickname != ''">
+                AND m.nickname LIKE CONCAT('%', #{nickname}, '%')
+            </if>
+            <if test="content != null and content != ''">
+                AND v.content LIKE CONCAT('%', #{content}, '%')
+            </if>
+        </where>
+    </select>
+</mapper>

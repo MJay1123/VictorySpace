@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:mariadb://localhost:3306/VSDB?useSSL=false&serverTimezone=Asia/Seoul&useUnicode=true&characterEncoding=utf8mb4
+    username: VictorySpace
+    password: vs1234!
+    driver-class-name: org.mariadb.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update   # create, create-drop, validate 등 필요에 따라 선택
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          lob:
+            non_contextual_creation: true
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+
+  mybatis:
+    mapper-locations: classpath:/mapper/**/*.xml
+    type-aliases-package: com.victoryspace.vics
