@@ -1,6 +1,7 @@
 <template>
   <div class="main-container">
     <header class="welcome-header">
+      <img :src="logo1" alt="VictorySpace Logo" class="logo" />
       <h1>VictorySpace에 오신 것을 환영합니다!</h1>
     </header>
     <main class="main-content">
@@ -10,6 +11,7 @@
 </template>
 
 <script setup>
+import logo1 from '@/assets/images/logo1.jpg'
 </script>
 
 <style scoped>
@@ -39,6 +41,12 @@
   align-items: center;
   justify-content: center;
   padding: 2rem;
+}
+
+.logo {
+  width: 140px; /* 원하면 100px ~ 200px 사이로 조절 */
+  display: block;
+  margin: 0 auto 1rem; /* 가운데 정렬 & 아래 간격 */
 }
 </style>
 
