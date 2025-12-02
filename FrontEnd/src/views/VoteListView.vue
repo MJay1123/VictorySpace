@@ -2,7 +2,7 @@
   <div>
     <h1>투표 목록</h1>
     <ul>
-      <li v-for="vote in votes" :key="vote.id" @click="openVote(vote.id)">
+      <li v-for="vote in votes" :key="vote.id" @click="openVoteDetailModal(vote.id)">
         <h3>{{ vote.title }}</h3>
         <p>{{ vote.content }}</p>
       </li>
@@ -35,9 +35,15 @@ onMounted(async () => {
   }
 });
 
-function openVote(id) {
-  selectedVoteId.value = id;
-}
+const showVoteDetailModal = ref(false)
+const openVoteDetailModal = (id) => {
+    showVoteDetailModal.value = true;
+    selectedVoteId.value = id;
+};
+const closeVoteDetailModal = () => {
+    showVoteDetailModal.value = false;
+    selectedVoteId.value = null;
+};
 </script>
 
 <style scoped>
