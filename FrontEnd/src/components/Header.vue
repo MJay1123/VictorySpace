@@ -20,7 +20,7 @@
 import { useRouter } from 'vue-router'
 import { ref } from 'vue'
 import logo2 from '@/assets/images/logo2.png'
-import LogoutModal from '@/components/modal/LogoutModal.vue'
+import LogoutModal from '@/components/modals/LogoutModal.vue'
 
 const router = useRouter()
 

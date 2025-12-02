@@ -19,7 +19,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import VoteDetailModal from './VoteDetailModal.vue';
+import VoteDetailModal from '@/components/modals/VoteDetailModal.vue';
 
 const votes = ref([]);
 const selectedVoteId = ref(null);
