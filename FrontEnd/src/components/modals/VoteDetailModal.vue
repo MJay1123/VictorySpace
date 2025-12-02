@@ -4,6 +4,7 @@
             <button class="close-btn" @click="$emit('close')">X</button>
 
             <h2>{{ vote.title }}</h2>
+            <h3 v-if="category">{{ category.name }}</h3>
 
             <div class="competition">
                 <!-- Home 영역 -->
@@ -14,8 +15,6 @@
                     <label>
                         <input type="radio" value="home" v-model="selectedOption" /> 선택
                     </label>
-                    <button v-if="!userVote" @click="voteChoice('home')">투표</button>
-                    <button v-else @click="cancelVote">투표취소</button>
                 </div>
 
                 <!-- Away 영역 -->
@@ -27,8 +26,6 @@
                         <input type="radio" value="away" v-model="selectedOption" /> 선택
                     </label>
                     <button v-if="!vote.challengerId" @click="challengeVote">도전하기</button>
-                    <button v-if="!userVote" @click="voteChoice('away')">투표</button>
-                    <button v-else @click="cancelVote">투표취소</button>
                 </div>
 
                 <!-- Neutral 영역 -->
@@ -64,6 +61,7 @@ const selectedOption = ref('home') // 기본 선택값
 const homeCount = ref(0)
 const awayCount = ref(0)
 const neutralCount = ref(0)
+const category = ref(null)
 
 const user = JSON.parse(localStorage.getItem('userInfo'))
 
@@ -96,6 +94,19 @@ async function fetchUserVote() {
 async function fetchVoteDetail(id) {
     const res = await fetch(`http://localhost:8080/api/vote/${id}`);
     vote.value = await res.json();
+}
+
+async function fetchCategory(categoryId) {
+    try {
+        const res = await fetch(`http://localhost:8080/api/category`);
+        if (!res.ok) throw new Error('카테고리 불러오기 실패');
+
+        const categories = await res.json(); // 전체 배열
+        category.value = categories.find(c => c.id === categoryId) || null; // 일치하는 것 하나만
+    } catch (err) {
+        console.error(err);
+        category.value = null;
+    }
 }
 
 // 👉 3) 전체 투표자 GET
@@ -150,7 +161,8 @@ async function cancelVote() {
 
 // 공통 새로고침
 const refreshData = async () => {
-    await fetchVoteDetail(props.voteId);
+    await fetchVoteDetail(props.voteId);  // vote 받아오기
+    await fetchCategory(vote.value.categoryId); // categoryId 존재할 때만
     await fetchVoters(props.voteId);
     await fetchUserVote();
 };

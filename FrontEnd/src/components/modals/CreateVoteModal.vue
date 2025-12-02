@@ -4,48 +4,74 @@
             <button class="close-btn" @click="$emit('close')">X</button>
             <h2>새 투표 만들기</h2>
 
-            <div>
-                <label>제목:</label>
-                <input v-model="title" placeholder="제목 입력">
-
-                <label>내용:</label>
-                <textarea v-model="content" placeholder="내용 입력"></textarea>
-
-                <label>기간:</label>
-                <div class="duration">
-                    <select v-model.number="durationValue">
-                        <option v-for="n in 30" :key="n" :value="n">{{ n }}</option>
-                    </select>
-                    <select v-model="durationUnit">
-                        <option value="h">hour</option>
-                        <option value="d">day</option>
-                    </select>
-                </div>
-
-                <button @click="createVote">생성</button>
+            <div class="form-group">
+                <label for="title">제목</label>
+                <input type="text" id="title" v-model="title" placeholder="제목을 입력하세요" />
             </div>
+
+            <div class="form-group">
+                <label for="category">카테고리</label>
+                <select id="category" v-model="selectedCategoryId">
+                    <option value="" disabled>카테고리를 선택하세요</option>
+                    <option v-for="cat in categories" :key="cat.id" :value="cat.id">
+                        {{ cat.name }}
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="content">내용</label>
+                <textarea id="content" v-model="content" placeholder="내용을 입력하세요"></textarea>
+            </div>
+
+            <div class="form-group duration">
+                <label>기간</label>
+                <select v-model="durationNumber">
+                    <option v-for="n in 30" :key="n" :value="n">{{ n }}</option>
+                </select>
+                <select v-model="durationUnit">
+                    <option value="h">hour</option>
+                    <option value="d">day</option>
+                </select>
+            </div>
+
+            <button @click="createVote">투표 생성</button>
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue';
 
-const title = ref('')
-const content = ref('')
-const durationValue = ref(null)
-const durationUnit = ref('')
+const title = ref('');
+const content = ref('');
+const durationNumber = ref(null);
+const durationUnit = ref('h');
+const categories = ref([]);
+const selectedCategoryId = ref('');
 
 const user = JSON.parse(localStorage.getItem('userInfo'))
+const emit = defineEmits(['created'])
+
+// 카테고리 불러오기
+onMounted(async () => {
+    try {
+        const res = await fetch('http://localhost:8080/api/category');
+        if (!res.ok) throw new Error('카테고리 불러오기 실패');
+        categories.value = await res.json();
+    } catch (error) {
+        console.error(error);
+    }
+});
+
 
 const createVote = async () => {
-    
-    if (!title.value || !content.value || !durationValue.value || !durationUnit.value) {
-        alert('모든 항목을 입력해주세요.');
+    if (!title.value || !content.value || !durationNumber.value || !durationUnit.value || !selectedCategoryId.value) {
+        alert('모든 항목을 입력해주세요');
         return;
     }
 
-    const duration = `${durationValue.value}${durationUnit.value}`
+    const duration = `${durationNumber.value}${durationUnit.value}`
 
     try {
         const res = await fetch('http://localhost:8080/api/vote', {
@@ -53,6 +79,7 @@ const createVote = async () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 title: title.value,
+                categoryId: selectedCategoryId.value,
                 content: content.value,
                 memberId: user.id,
                 duration: duration
@@ -66,7 +93,7 @@ const createVote = async () => {
         }
 
         alert('투표가 생성되었습니다!')
-        $emit('created')
+        emit('created')
     } catch (err) {
         console.error(err)
         alert('서버 오류!')

@@ -1,7 +1,7 @@
 <template>
   <div>
     <h1>투표 목록</h1>
-    <button @click="showCreateVoteModal = true">새 투표 만들기</button>
+    <button @click="openCreateVoteModal">새 투표 만들기</button>
 
     <ul>
       <li v-for="vote in votes" :key="vote.id" @click="openVoteDetailModal(vote.id)">
@@ -11,18 +11,10 @@
     </ul>
 
     <!-- 상세 모달 -->
-    <VoteDetailModal
-      v-if="selectedVoteId !== null"
-      :vote-id="selectedVoteId"
-      @close="selectedVoteId = null"
-    />
+    <VoteDetailModal v-if="selectedVoteId !== null" :vote-id="selectedVoteId" @close="closeVoteDetailModal" />
 
     <!-- 새 투표 생성 모달 -->
-    <CreateVoteModal
-      v-if="showCreateVoteModal"
-      @close="showCreateVoteModal = false"
-      @created="onVoteCreated"
-    />
+    <CreateVoteModal v-if="showCreateVoteModal" @close="showCreateVoteModal = false" @created="onVoteCreated" />
   </div>
 </template>
 
@@ -36,18 +28,18 @@ const selectedVoteId = ref(null);
 
 const showCreateVoteModal = ref(false)
 const openCreateVoteModal = () => {
-    showCreateVoteModal.value = true;
+  showCreateVoteModal.value = true;
 };
 const closeCreateVoteModal = () => {
-    showCreateVoteModal.value = false;
+  showCreateVoteModal.value = false;
 };
 const onVoteCreated = () => {
-    closeCreateVoteModal();
-    fetchVotes();
+  closeCreateVoteModal();
+  fetchVotes();
 };
 
-// 투표 목록 불러오기
-onMounted(async () => {
+// ✅ 투표 목록 가져오는 함수
+const fetchVotes = async () => {
   try {
     const res = await fetch('http://localhost:8080/api/vote');
     if (!res.ok) throw new Error('투표 목록 불러오기 실패');
@@ -55,16 +47,21 @@ onMounted(async () => {
   } catch (error) {
     console.error(error);
   }
+};
+
+// 투표 목록 불러오기
+onMounted(() => {
+  fetchVotes();
 });
 
 const showVoteDetailModal = ref(false)
 const openVoteDetailModal = (id) => {
-    showVoteDetailModal.value = true;
-    selectedVoteId.value = id;
+  showVoteDetailModal.value = true;
+  selectedVoteId.value = id;
 };
 const closeVoteDetailModal = () => {
-    showVoteDetailModal.value = false;
-    selectedVoteId.value = null;
+  showVoteDetailModal.value = false;
+  selectedVoteId.value = null;
 };
 </script>
 
