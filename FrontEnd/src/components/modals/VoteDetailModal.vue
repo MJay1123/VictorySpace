@@ -11,9 +11,14 @@
                     <h3>Home</h3>
                     <p>{{ vote.content }}</p>
                     <p>{{ homeCount }}표</p>
+<<<<<<< HEAD
                     <label>
                         <input type="radio" value="home" v-model="selectedOption" /> 선택
                     </label>
+=======
+                    <button v-if="!userVote" @click="voteChoice('home')">투표</button>
+                    <button v-else @click="cancelVote">투표취소</button>
+>>>>>>> 4488f8eb7b744b64e574386a9c8fe74f1ba67a28
                 </div>
 
                 <!-- Away 영역 -->
@@ -25,6 +30,11 @@
                         <input type="radio" value="away" v-model="selectedOption" /> 선택
                     </label>
                     <button v-if="!vote.challengerId" @click="challengeVote">도전하기</button>
+<<<<<<< HEAD
+=======
+                    <button v-if="!userVote" @click="voteChoice('away')">투표</button>
+                    <button v-else @click="cancelVote">투표취소</button>
+>>>>>>> 4488f8eb7b744b64e574386a9c8fe74f1ba67a28
                 </div>
 
                 <!-- Neutral 영역 -->
@@ -61,11 +71,18 @@ const homeCount = ref(0)
 const awayCount = ref(0)
 const neutralCount = ref(0)
 
+<<<<<<< HEAD
 const user = JSON.parse(localStorage.getItem('userInfo'))
 
 // 👉 1) 투표 여부 확인 API
 async function fetchUserVote() {
     try {
+=======
+// 👉 1) 투표 여부 확인 API
+async function fetchUserVote() {
+    try {
+        const user = JSON.parse(localStorage.getItem('userInfo'));
+>>>>>>> 4488f8eb7b744b64e574386a9c8fe74f1ba67a28
         if (!user || !user.id) {
             userVote.value = null;
             return;
@@ -99,14 +116,24 @@ async function fetchVoters(voteId) {
     const res = await fetch(`http://localhost:8080/api/voter/vote/${voteId}`);
     voters.value = await res.json();
 
+<<<<<<< HEAD
     homeCount.value = voters.value.filter(v => v.content === 'home').length
     awayCount.value = voters.value.filter(v => v.content === 'away').length
     neutralCount.value = voters.value.filter(v => v.content === 'neutral').length
+=======
+    homeCount.value = voters.value.filter(v => v.content === 'home').length;
+    awayCount.value = voters.value.filter(v => v.content === 'away').length;
+>>>>>>> 4488f8eb7b744b64e574386a9c8fe74f1ba67a28
 }
 
 
 // 👉 4) 투표 등록
 const voteChoice = async (side) => {
+<<<<<<< HEAD
+=======
+    const user = JSON.parse(localStorage.getItem('userInfo'));
+
+>>>>>>> 4488f8eb7b744b64e574386a9c8fe74f1ba67a28
     if (!user || !user.id) {
         alert("로그인이 필요합니다.");
         return;
@@ -118,7 +145,11 @@ const voteChoice = async (side) => {
         body: JSON.stringify({
             voteId: props.voteId,
             memberId: user.id,
+<<<<<<< HEAD
             content: selectedOption.value
+=======
+            content: side
+>>>>>>> 4488f8eb7b744b64e574386a9c8fe74f1ba67a28
         })
     });
 
