@@ -1,17 +1,26 @@
 <template>
   <header class="app-header">
     <div class="header-container">
+
+      <!-- 로고 추가 -->
+      <img :src="logo2" alt="logo" class="logo" />
+
       <div class="left-buttons">
         <button @click="goHome" class="home-button">홈</button>
         <button @click="goProfile" class="profile-button">내 정보</button>
       </div>
-      <button @click="handleLogout" class="logout-button">로그아웃</button>
+
+      <button @click="openLogoutModal" class="logout-button">로그아웃</button>
+      <LogoutModal v-if="showLogoutModal" @close="closeLogoutModal" />
     </div>
   </header>
 </template>
 
 <script setup>
 import { useRouter } from 'vue-router'
+import { ref } from 'vue'
+import logo2 from '@/assets/images/logo2.png'
+import LogoutModal from '@/components/modal/LogoutModal.vue'
 
 const router = useRouter()
 
@@ -23,11 +32,13 @@ const goProfile = () => {
   router.push('/main/profile')
 }
 
-const handleLogout = () => {
-  // localStorage에서 사용자 정보 제거
-  localStorage.removeItem('userInfo')
-  // StartPage로 이동
-  router.push('/')
+const showLogoutModal = ref(false)
+
+const openLogoutModal = () => {
+  showLogoutModal.value = true
+}
+const closeLogoutModal = () => {
+  showLogoutModal.value = false
 }
 </script>
 
@@ -47,6 +58,18 @@ const handleLogout = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+/* 🔥 로고 스타일 */
+.logo {
+  height: 42px;
+  width: auto;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.logo:hover {
+  transform: scale(1.05);
 }
 
 .left-buttons {
