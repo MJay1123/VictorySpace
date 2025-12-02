@@ -20,3 +20,6 @@ spring:
   mybatis:
     mapper-locations: classpath:/mapper/**/*.xml
     type-aliases-package: com.victoryspace.vics
+
+  jwt:
+    secret: "FXPuAO6W9NL05SikhdJdatT0/Ekz3LYo0Ww7PCJDLIQk5HbHk6Iez10od4W49maLogHFCEpjl7adX7f+/z7yYg=="
