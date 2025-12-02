@@ -8,6 +8,7 @@
                type="com.victoryspace.vics.vote.query.dto.VoteQueryDTO">
         <result property="id" column="id"/>
         <result property="title" column="title"/>
+        <result property="categoryId" column="category_id"/>
         <result property="memberId" column="member_id"/>
         <result property="content" column="content"/>
         <result property="challengerId" column="challenger_id"/>
@@ -22,6 +23,7 @@
     <select id="findAll" resultMap="VoteResultMap">
         SELECT id,
                title,
+               category_id,
                member_id,
                content,
                challenger_id,
@@ -37,6 +39,7 @@
     <select id="findById" resultMap="VoteResultMap">
         SELECT id,
                title,
+               category_id,
                member_id,
                content,
                challenger_id,
@@ -53,6 +56,7 @@
     <select id="findByMemberId" resultMap="VoteResultMap">
         SELECT id,
                title,
+               category_id,
                member_id,
                content,
                challenger_id,
@@ -69,6 +73,7 @@
     <select id="findByChallengerId" resultMap="VoteResultMap">
         SELECT id,
                title,
+               category_id,
                member_id,
                content,
                challenger_id,

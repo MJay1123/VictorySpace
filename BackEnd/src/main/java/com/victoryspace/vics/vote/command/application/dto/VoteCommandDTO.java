@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 public class VoteCommandDTO {
     private Integer id;
     private String title;
+    private Integer categoryId;
     private Integer memberId;
     private String content;
     private Integer challengerId;
