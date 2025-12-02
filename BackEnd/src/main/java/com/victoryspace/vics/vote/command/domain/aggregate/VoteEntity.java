@@ -23,6 +23,9 @@ public class VoteEntity {
     @Column(name = "title")
     private String title;
 
+    @Column(name = "category_id")
+    private Integer categoryId;
+
     @Column(name = "member_id")
     private Integer memberId;
 

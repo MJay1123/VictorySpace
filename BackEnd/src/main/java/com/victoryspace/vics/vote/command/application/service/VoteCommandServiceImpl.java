@@ -20,6 +20,7 @@ public class VoteCommandServiceImpl implements VoteCommandService {
     public VoteCommandDTO createVote(VoteCommandDTO voteCommandDTO) {
         VoteEntity voteEntity = new VoteEntity();
         voteEntity.setTitle(voteCommandDTO.getTitle());
+        voteEntity.setCategoryId(voteCommandDTO.getCategoryId());
         voteEntity.setContent(voteCommandDTO.getContent());
         voteEntity.setMemberId(voteCommandDTO.getMemberId());
         voteEntity.setCreatedAt(LocalDateTime.now());
@@ -34,6 +35,7 @@ public class VoteCommandServiceImpl implements VoteCommandService {
         VoteEntity voteEntity = voteRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Vote not found"));
         voteEntity.setTitle(voteCommandDTO.getTitle());
+        voteEntity.setCategoryId(voteCommandDTO.getCategoryId());
         voteEntity.setContent(voteCommandDTO.getContent());
         voteEntity.setUpdatedAt(LocalDateTime.now());
         voteEntity.setDuration(voteCommandDTO.getDuration());

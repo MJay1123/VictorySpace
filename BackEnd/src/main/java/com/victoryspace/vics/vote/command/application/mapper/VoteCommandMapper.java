@@ -10,6 +10,7 @@ public class VoteCommandMapper {
         VoteCommandDTO dto = new VoteCommandDTO();
         dto.setId(entity.getId());
         dto.setTitle(entity.getTitle());
+        dto.setCategoryId(entity.getCategoryId());
         dto.setMemberId(entity.getMemberId());
         dto.setContent(entity.getContent());
         dto.setChallengerId(entity.getChallengerId());
