@@ -11,20 +11,36 @@
                     <h3>Home</h3>
                     <p>{{ vote.content }}</p>
                     <p>{{ homeCount }}표</p>
-                    <button @click="voteChoice('home')">투표</button>
+                    <label>
+                        <input type="radio" value="home" v-model="selectedOption" /> 선택
+                    </label>
                 </div>
 
                 <!-- Away 영역 -->
-                <div class="side away" :class="{
-                    'gray': !vote.challengerId,
-                    'red': vote.challengerId
-                }">
+                <div class="side away" :class="{ gray: !vote.challengerId, red: vote.challengerId }">
                     <h3>Away</h3>
                     <p>{{ vote.challengerContent || '아직 도전자가 없습니다' }}</p>
                     <p>{{ awayCount }}표</p>
+                    <label v-if="vote.challengerId">
+                        <input type="radio" value="away" v-model="selectedOption" /> 선택
+                    </label>
                     <button v-if="!vote.challengerId" @click="challengeVote">도전하기</button>
-                    <button v-else @click="voteChoice('away')">투표</button>
                 </div>
+
+                <!-- Neutral 영역 -->
+                <div class="side neutral">
+                    <h3>Neutral</h3>
+                    <p>{{ neutralCount }}표</p>
+                    <label>
+                        <input type="radio" value="neutral" v-model="selectedOption" /> 선택
+                    </label>
+                </div>
+            </div>
+
+            <!-- 투표 / 취소 버튼 -->
+            <div class="vote-actions">
+                <button v-if="!userVote" @click="voteChoice">투표</button>
+                <button v-else @click="cancelVote">투표취소</button>
             </div>
         </div>
     </div>
@@ -35,43 +51,108 @@ import { ref, watch } from 'vue';
 
 const props = defineProps({
     voteId: Number,
-    memberId: Number // 로그인한 회원 id
 });
 
-const vote = ref({});
-const voters = ref([]);
-const userVote = ref(null); // 현재 로그인한 사용자의 투표 정보
-const homeCount = ref(0);
-const awayCount = ref(0);
+const vote = ref({})
+const voters = ref([])
+const userVote = ref(null)
+const selectedOption = ref('home') // 기본 선택값
+const homeCount = ref(0)
+const awayCount = ref(0)
+const neutralCount = ref(0)
 
-async function fetchVoteDetail(id) {
+const user = JSON.parse(localStorage.getItem('userInfo'))
+
+// 👉 1) 투표 여부 확인 API
+async function fetchUserVote() {
     try {
-        const res = await fetch(`http://localhost:8080/api/vote/${id}`);
-        if (!res.ok) throw new Error('투표 상세 불러오기 실패');
-        vote.value = await res.json();
-    } catch (error) {
-        console.error(error);
-    }
-}
-
-async function fetchVoters(id) {
-    try {
-        const res = await fetch(`http://localhost:8080/api/voter/vote/${id}`);
-        if (!res.ok) throw new Error('투표자 목록 불러오기 실패');
-        voters.value = await res.json();
-
-        // 로그인한 사용자의 투표가 있는지 확인
-        const user = JSON.parse(localStorage.getItem('userInfo'));
-        if (user) {
-            userVote.value = data.find(v => v.memberId === user.id) || null;
+        if (!user || !user.id) {
+            userVote.value = null;
+            return;
         }
 
-        homeCount.value = voters.value.filter(v => v.content === 'home').length;
-        awayCount.value = voters.value.filter(v => v.content === 'away').length;
-    } catch (error) {
-        console.error(error);
+        const res = await fetch(`http://localhost:8080/api/voter/vote/${props.voteId}/member/${user.id}`);
+
+        if (res.status === 404) {
+            userVote.value = null;
+            return;
+        }
+
+        // body가 비어있지 않을 때만 파싱
+        const text = await res.text();
+        userVote.value = text ? JSON.parse(text) : null;
+
+    } catch (err) {
+        console.error("투표 여부 확인 실패", err);
+        userVote.value = null; // 안전하게 초기화
     }
 }
+
+// 👉 2) 투표 정보 GET
+async function fetchVoteDetail(id) {
+    const res = await fetch(`http://localhost:8080/api/vote/${id}`);
+    vote.value = await res.json();
+}
+
+// 👉 3) 전체 투표자 GET
+async function fetchVoters(voteId) {
+    const res = await fetch(`http://localhost:8080/api/voter/vote/${voteId}`);
+    voters.value = await res.json();
+
+    homeCount.value = voters.value.filter(v => v.content === 'home').length
+    awayCount.value = voters.value.filter(v => v.content === 'away').length
+    neutralCount.value = voters.value.filter(v => v.content === 'neutral').length
+}
+
+
+// 👉 4) 투표 등록
+const voteChoice = async (side) => {
+    if (!user || !user.id) {
+        alert("로그인이 필요합니다.");
+        return;
+    }
+
+    const res = await fetch('http://localhost:8080/api/voter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            voteId: props.voteId,
+            memberId: user.id,
+            content: selectedOption.value
+        })
+    });
+
+    if (!res.ok) {
+        const msg = await res.text();
+        console.error("서버 오류:", msg);
+        throw new Error("투표 실패 ❌");
+    }
+
+    await refreshData();
+};
+
+// 👉 5) 투표 취소
+async function cancelVote() {
+    if (!userVote.value) return;
+
+    const res = await fetch(`http://localhost:8080/api/voter/${userVote.value.id}`, {
+        method: 'DELETE'
+    });
+
+    if (!res.ok) return alert("삭제 실패!");
+
+    await refreshData();
+}
+
+// 공통 새로고침
+const refreshData = async () => {
+    await fetchVoteDetail(props.voteId);
+    await fetchVoters(props.voteId);
+    await fetchUserVote();
+};
+
+// voteId 변경 시 자동 reload
+watch(() => props.voteId, () => refreshData(), { immediate: true });
 
 // 도전하기 버튼 클릭
 const challengeVote = async () => {
@@ -104,46 +185,6 @@ const challengeVote = async () => {
         console.error(error);
     }
 };
-
-// 투표하기
-const voteChoice = async (side) => {
-    const user = JSON.parse(localStorage.getItem('userInfo'));
-    if (!user) {
-        alert('로그인이 필요합니다.');
-        return;
-    }
-    const res = await fetch('http://localhost:8080/api/voter', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            voteId: props.voteId,
-            memberId: user.id,
-            content: side
-        })
-    });
-    if (!res.ok) throw new Error('투표 실패');
-    await fetchVoteDetail(props.voteId);
-    await fetchVoters(props.voteId);
-};
-
-// 투표 취소
-const cancelVote = async () => {
-    if (!userVote.value) return;
-    const res = await fetch(`http://localhost:8080/api/voter/${userVote.value.id}`, {
-        method: 'DELETE'
-    });
-    if (!res.ok) throw new Error('투표 취소 실패');
-    await fetchVoteDetail(props.voteId);
-    await fetchVoters(props.voteId);
-};
-
-// voteId 바뀔 때마다 상세와 투표자 정보 fetch
-watch(() => props.voteId, (id) => {
-    if (id) {
-        fetchVoteDetail(id);
-        fetchVoters(id);
-    }
-}, { immediate: true });
 </script>
 
 <style scoped>
@@ -179,6 +220,18 @@ watch(() => props.voteId, (id) => {
     display: flex;
     justify-content: space-between;
     margin-top: 20px;
+}
+
+.vote-options label {
+    display: block;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.vote-actions button {
+    margin-top: 10px;
+    padding: 5px 10px;
+    cursor: pointer;
 }
 
 .side {
