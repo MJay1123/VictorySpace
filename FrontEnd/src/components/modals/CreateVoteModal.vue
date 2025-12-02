@@ -6,10 +6,10 @@
 
             <div>
                 <label>제목:</label>
-                <input v-model="title" type="text" />
+                <input v-model="title" placeholder="제목 입력">
 
                 <label>내용:</label>
-                <textarea v-model="content"></textarea>
+                <textarea v-model="content" placeholder="내용 입력"></textarea>
 
                 <label>기간:</label>
                 <div class="duration">
@@ -33,15 +33,18 @@ import { ref } from 'vue'
 
 const title = ref('')
 const content = ref('')
-const durationValue = ref(1)
-const durationUnit = ref('h')
+const durationValue = ref(null)
+const durationUnit = ref('')
 
 const user = JSON.parse(localStorage.getItem('userInfo'))
 
 const createVote = async () => {
-    if (!title.value || !content.value || !duration.value) {
-        return alert('모든 항목을 입력해주세요.')
+    
+    if (!title.value || !content.value || !durationValue.value || !durationUnit.value) {
+        alert('모든 항목을 입력해주세요.');
+        return;
     }
+
     const duration = `${durationValue.value}${durationUnit.value}`
 
     try {
@@ -52,7 +55,7 @@ const createVote = async () => {
                 title: title.value,
                 content: content.value,
                 memberId: user.id,
-                duration: duration.value
+                duration: duration
             })
         })
 
