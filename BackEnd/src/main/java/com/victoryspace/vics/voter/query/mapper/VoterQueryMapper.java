@@ -14,4 +14,6 @@ public interface VoterQueryMapper {
     List<VoterQueryDTO> findByVoteId(int voteId);
 
     List<VoterQueryDTO> findByMemberId(int memberId);
+
+    VoterQueryDTO findByVoteAndMemberId(int voteId, int memberId);
 }

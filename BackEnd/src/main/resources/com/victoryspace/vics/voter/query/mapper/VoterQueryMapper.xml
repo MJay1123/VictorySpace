@@ -46,4 +46,14 @@
         FROM voter
         WHERE member_id = #{memberId}
     </select>
+
+    <select id="findByVoteAndMemberId" resultMap="VoterResultMap">
+        SELECT id,
+               vote_id,
+               member_id,
+               content
+        FROM voter
+        WHERE vote_id = #{voteId}
+        AND member_id = #{memberId}
+    </select>
 </mapper>

@@ -36,4 +36,10 @@ public class VoterQueryServiceImpl implements VoterQueryService {
         List<VoterQueryDTO> dtoList = mapper.findByMemberId(memberId);
         return dtoList;
     }
+
+    @Override
+    public VoterQueryDTO findByVoteAndMemberId(int voteId, int memberId) {
+        VoterQueryDTO dto = mapper.findByVoteAndMemberId(voteId, memberId);
+        return dto;
+    }
 }

@@ -39,4 +39,10 @@ public class VoterQueryController {
         List<VoterQueryDTO> dtoList = voterQueryService.findByMemberId(memberId);
         return dtoList;
     }
+
+    @GetMapping("/vote/{voteId}/member/{memberId}")
+    public VoterQueryDTO findByVoteAndMemberId(@PathVariable("voteId") int voteId,@PathVariable("memberId") int memberId){
+        VoterQueryDTO dto = voterQueryService.findByVoteAndMemberId(voteId, memberId);
+        return dto;
+    }
 }
