@@ -15,27 +15,26 @@ public class CustomUserDetails implements UserDetails {
         this.memberEntity = memberEntity;
     }
 
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new GrantedAuthority() {
             @Override
             public String getAuthority() {
-                return null;
+                return memberEntity.getRole();
             }
         });
-        return List.of();
-    }
-
-    @Override
-    public String getPassword() {
-        return memberEntity.getPassword();
+        return authorities;
     }
 
     @Override
     public String getUsername() {
         return memberEntity.getEmail();
+    }
+
+    @Override
+    public String getPassword() {
+        return memberEntity.getPassword();
     }
 
     @Override

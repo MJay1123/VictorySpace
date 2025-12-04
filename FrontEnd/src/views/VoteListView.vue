@@ -41,7 +41,16 @@ const onVoteCreated = () => {
 // ✅ 투표 목록 가져오는 함수
 const fetchVotes = async () => {
   try {
-    const res = await fetch('http://localhost:8080/api/vote');
+    const token = localStorage.getItem('token');
+
+    const res = await fetch('http://localhost:8080/api/vote', {
+      method: 'GET',
+      headers: {
+        'Authorization': `${token}`,
+        'Content-Type': 'application/json'
+      }
+
+    });
     if (!res.ok) throw new Error('투표 목록 불러오기 실패');
     votes.value = await res.json();
   } catch (error) {

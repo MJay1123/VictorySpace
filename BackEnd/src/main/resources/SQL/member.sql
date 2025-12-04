@@ -15,20 +15,21 @@ CREATE TABLE member (
         deleted_at DATETIME DEFAULT NULL,
         grade_id INT NOT NULL,
         profile VARCHAR(255) NULL,
-        point INT NOT NULL DEFAULT 1000
+        point INT NOT NULL DEFAULT 1000,
+        role VARCHAR(50) NOT NULL
 );
 
 ALTER TABLE member CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
-INSERT INTO member (name, gender, birthday, nickname, password, email, grade_id)
+INSERT INTO member (name, gender, birthday, nickname, password, email, grade_id, role)
 VALUES
-    ('김민준', 'M', '1980-05-12', 'Min', 'pass1234', 'minjoon@example.com', 1),
-    ('이수영', 'F', '1990-04-22', 'Soo', 'mypassword', 'sooyoung@example.com', 2),
-    ('박지수', 'F', '2000-01-03', 'Jis', '12345678', 'jisoo@example.com', 3),
-    ('최현우', 'M', '2004-05-05', 'Hyun', 'qwerty', 'hyunwoo@example.com', 4),
-    ('정하은', 'F', '1990-02-03', 'Hae', 'abcdefg', 'haeun@example.com', 5),
-    ('운영자', 'M', '1999-01-01', 'admin', 'admin', 'admin@email.com', 5),
-    ('테스트1', 'M', '1990-01-01','test1', 'test1', 'test1@naver.com', 1),
-    ('테스트2', 'M', '1990-02-02', 'test2', 'test2', 'test2@naver.com', 2),
-     ('테스트3', 'M', '1990-03-03', 'test3', 'test3', 'test3@naver.com', 3),
-     ('테스트4', 'M', '1990-04-04', 'test4', 'test4', 'test4@naver.com', 4);
+    ('김민준', 'M', '1980-05-12', 'Min', 'pass1234', 'minjoon@example.com', 1, 'ROLE_USER'),
+    ('이수영', 'F', '1990-04-22', 'Soo', 'mypassword', 'sooyoung@example.com', 2, 'ROLE_USER'),
+    ('박지수', 'F', '2000-01-03', 'Jis', '12345678', 'jisoo@example.com', 3, 'ROLE_USER'),
+    ('최현우', 'M', '2004-05-05', 'Hyun', 'qwerty', 'hyunwoo@example.com', 4,'ROLE_USER'),
+    ('정하은', 'F', '1990-02-03', 'Hae', 'abcdefg', 'haeun@example.com', 5,'ROLE_USER'),
+    ('운영자', 'M', '1999-01-01', 'admin', 'admin', 'admin@email.com', 5,'ROLE_USER'),
+    ('테스트1', 'M', '1990-01-01','test1', 'test1', 'test1@naver.com', 1,'ROLE_USER'),
+    ('테스트2', 'M', '1990-02-02', 'test2', 'test2', 'test2@naver.com', 2,'ROLE_USER'),
+     ('테스트3', 'M', '1990-03-03', 'test3', 'test3', 'test3@naver.com', 3,'ROLE_USER'),
+     ('테스트4', 'M', '1990-04-04', 'test4', 'test4', 'test4@naver.com', 4,'ROLE_USER');

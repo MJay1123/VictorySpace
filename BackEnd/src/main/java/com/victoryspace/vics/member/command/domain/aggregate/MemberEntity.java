@@ -56,4 +56,7 @@ public class MemberEntity {
 
     @Column(name = "point")
     private Integer point;
+
+    @Column(name = "role")
+    private String role;
 }

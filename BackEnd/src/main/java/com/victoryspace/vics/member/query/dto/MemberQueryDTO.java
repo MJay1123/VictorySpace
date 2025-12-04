@@ -26,4 +26,5 @@ public class MemberQueryDTO {
     private Integer gradeId;
     private String profile;
     private Integer point;
+    private String role;
 }

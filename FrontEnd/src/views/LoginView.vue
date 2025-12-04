@@ -16,25 +16,12 @@
       <form @submit.prevent="handleLogin" class="login-form">
         <div class="form-group">
           <label for="email">이메일</label>
-          <input
-            id="email"
-            v-model="email"
-            type="email"
-            placeholder="이메일을 입력하세요"
-            required
-            :disabled="isLoading"
-          />
+          <input id="email" v-model="email" type="email" placeholder="이메일을 입력하세요" required :disabled="isLoading" />
         </div>
         <div class="form-group">
           <label for="password">비밀번호</label>
-          <input
-            id="password"
-            v-model="password"
-            type="password"
-            placeholder="비밀번호를 입력하세요"
-            required
-            :disabled="isLoading"
-          />
+          <input id="password" v-model="password" type="password" placeholder="비밀번호를 입력하세요" required
+            :disabled="isLoading" />
         </div>
         <button type="submit" class="login-button" :disabled="isLoading">
           {{ isLoading ? '로그인 중...' : '로그인' }}
@@ -71,36 +58,42 @@ const handleLogin = async () => {
   }
 
   try {
-    // DTO 객체 생성 (email, password)
-    const loginDto = {
-      email: email.value,
-      password: password.value
-    }
-
-    // localhost:8080/api/member/login으로 POST 요청 (JSON 형식으로 body에 DTO 전송)
-    const response = await fetch('http://localhost:8080/api/member/login', {
+    const response = await fetch('http://localhost:8080/api/auth/login', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify(loginDto)
-    })
+      body: new URLSearchParams({
+        email: email.value,
+        password: password.value
+      })
+    });
 
     if (response.ok) {
-      // 로그인 성공 - DTO 반환
-      const userData = await response.json()
-      
-      // password 필드는 제외하고 사용자 정보 저장
-      const { password: _, ...userInfo } = userData
-      localStorage.setItem('userInfo', JSON.stringify(userInfo))
-      
-      // 환영 메시지 표시
-      showWelcome.value = true
-      
-      // 1.5초 후 메인화면으로 이동
+      // 헤더에서 토큰 꺼내오기
+      const token = response.headers.get("Authorization");
+
+      if (token) {
+        localStorage.setItem("token", token);
+      }
+
+      if (token) {
+        // 2️⃣ localStorage에 저장 (Bearer 포함해야 함)
+        localStorage.setItem('token', token);
+      }
+
+      // 3️⃣ userInfo JSON body 가져오기 (있으면)
+      const userData = await response.json().catch(() => null);
+      if (userData) {
+        localStorage.setItem('userInfo', JSON.stringify(userData));
+      }
+
+      showWelcome.value = true;
+
       setTimeout(() => {
         router.push('/main')
-      }, 1500)
+      }, 1500);
+
     } else {
       // 백엔드에서 에러 반환
       const errorData = await response.json().catch(() => ({}))
@@ -261,6 +254,7 @@ const handleLogin = async () => {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -271,10 +265,10 @@ const handleLogin = async () => {
     transform: translateY(20px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
   }
 }
 </style>
-

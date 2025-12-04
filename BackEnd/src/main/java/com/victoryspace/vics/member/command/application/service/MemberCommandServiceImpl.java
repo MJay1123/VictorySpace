@@ -30,6 +30,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         entity.setGradeId(dto.getGradeId());
         entity.setProfile(dto.getProfile());
         entity.setPoint(1000);
+        entity.setRole("ROLE_USER");
         MemberEntity createdMemberEntity = memberRepository.save(entity);
         return memberCommandMapper.toDto(createdMemberEntity);
     }

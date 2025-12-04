@@ -21,6 +21,7 @@ public class MemberCommandMapper {
         dto.setGradeId(entity.getGradeId());
         dto.setProfile(entity.getProfile());
         dto.setPoint(entity.getPoint());
+        dto.setRole(entity.getRole());
         return dto;
     }
 }

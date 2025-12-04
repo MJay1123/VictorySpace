@@ -1,4 +1,4 @@
-package com.victoryspace.vics;
+package com.victoryspace.vics.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +17,7 @@ public class CorsConfig {
                         .allowedOrigins("http://localhost:5173")
                         .allowedMethods("GET","POST","PUT","DELETE","PATCH")
                         .allowedHeaders("*")
+                        .exposedHeaders("Authorization") // 🔥 이거 반드시 필요
                         .allowCredentials(true);
             }
         };

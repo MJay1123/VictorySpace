@@ -16,16 +16,9 @@ public class JwtUtil {
     public JwtUtil(@Value("${spring.jwt.secret}") String secret) {
         secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), SignatureAlgorithm.HS256.getJcaName());
     }
-    public String trimToken(String token) {
-        if (token.startsWith("Bearer ")) {
-            return token.substring(7);
-        }
-        return token;
-    }
 
     public Boolean validateToken(String token) {
         try {
-            token = trimToken(token);
             Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
             return true;
         } catch (Exception e) {
@@ -34,16 +27,20 @@ public class JwtUtil {
     }
 
     public String getEmail(String token) {
-        token = trimToken(token);
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("email", String.class);
     }
     public String getRole(String token) {
-        token = trimToken(token);
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("role", String.class);
     }
     public Boolean isExpired(String token) {
-        token = trimToken(token);
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
+        Date expiration = Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getExpiration();
+
+        return expiration.before(new Date()); // true = expired
     }
     public String createToken(String email, String role, Long expiredMs) {
         return Jwts.builder()

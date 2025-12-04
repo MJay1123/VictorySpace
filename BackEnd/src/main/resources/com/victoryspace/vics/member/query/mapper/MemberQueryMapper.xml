@@ -19,6 +19,7 @@
         <result property="gradeId" column="grade_id"/>
         <result property="profile" column="profile"/>
         <result property="point" column="point"/>
+        <result property="role" column="role"/>
     </resultMap>
 
     <select id="findAll" resultMap="MemberResultMap">
@@ -34,7 +35,8 @@
                deleted_at,
                grade_id,
                profile,
-               point
+               point,
+               role
         FROM member
     </select>
 
@@ -51,7 +53,8 @@
                deleted_at,
                grade_id,
                profile,
-               point
+               point,
+               role
         FROM member
         WHERE id = #{id}
     </select>
@@ -69,7 +72,8 @@
                deleted_at,
                grade_id,
                profile,
-               point
+               point,
+               role
         FROM member
         WHERE nickname LIKE CONCAT('%', #{nickname}, '%')
     </select>
@@ -87,7 +91,8 @@
         deleted_at,
         grade_id,
         profile,
-        point
+        point,
+        role
         FROM member
         <choose>
             <when test="direction == 'asc'">

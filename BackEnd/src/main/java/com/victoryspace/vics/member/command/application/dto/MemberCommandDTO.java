@@ -23,4 +23,5 @@ public class MemberCommandDTO {
     private Integer gradeId;
     private String profile;
     private Integer point;
+    private String role;
 }
