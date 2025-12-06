@@ -14,12 +14,13 @@
     <VoteDetailModal v-if="selectedVoteId !== null" :vote-id="selectedVoteId" @close="closeVoteDetailModal" />
 
     <!-- 새 투표 생성 모달 -->
-    <CreateVoteModal v-if="showCreateVoteModal" @close="showCreateVoteModal = false" @created="onVoteCreated" />
+    <CreateVoteModal v-if="showCreateVoteModal" @close="closeCreateVoteModal" @created="onVoteCreated" />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import voteApi from '@/api/voteApi.js';
 import VoteDetailModal from '@/components/modals/VoteDetailModal.vue';
 import CreateVoteModal from '@/components/modals/CreateVoteModal.vue';
 
@@ -27,34 +28,21 @@ const votes = ref([]);
 const selectedVoteId = ref(null);
 
 const showCreateVoteModal = ref(false)
-const openCreateVoteModal = () => {
-  showCreateVoteModal.value = true;
-};
-const closeCreateVoteModal = () => {
-  showCreateVoteModal.value = false;
-};
+const openCreateVoteModal = () => {showCreateVoteModal.value = true;};
+const closeCreateVoteModal = () => {showCreateVoteModal.value = false;};
+
 const onVoteCreated = () => {
   closeCreateVoteModal();
   fetchVotes();
 };
 
-// ✅ 투표 목록 가져오는 함수
+// --- 투표 목록 가져오기 (axios 적용) ---
 const fetchVotes = async () => {
   try {
-    const token = localStorage.getItem('token');
-
-    const res = await fetch('http://localhost:8080/api/vote', {
-      method: 'GET',
-      headers: {
-        'Authorization': `${token}`,
-        'Content-Type': 'application/json'
-      }
-
-    });
-    if (!res.ok) throw new Error('투표 목록 불러오기 실패');
-    votes.value = await res.json();
-  } catch (error) {
-    console.error(error);
+    const res = await voteApi.getAllVotes();
+    votes.value = res.data;
+  } catch (err) {
+    console.error("투표 목록 불러오기 실패:", err);
   }
 };
 
