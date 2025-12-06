@@ -23,6 +23,14 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
+        String requestURI = request.getRequestURI();
+
+        // 회원가입 / 로그인 요청은 JWT 검증 제외
+        if (requestURI.startsWith("/api/auth")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         // Request에서 Authorization 헤더를 찾음
         String authorization = request.getHeader("Authorization");
 

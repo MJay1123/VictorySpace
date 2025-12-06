@@ -1,22 +1,22 @@
 // src/api/voterApi.js
-import api from "./api";
+import http from "./http";
 
 const BASE_URL = "/voter";
 
 export const voterApi = {
   /** --- Query --- */
-  getAllVoters: () => api.get(`${BASE_URL}`),
+  getAllVoters: () => http.get(`${BASE_URL}`),
 
-  getVoterById: (id) => api.get(`${BASE_URL}/${id}`),
+  getVoterById: (id) => http.get(`${BASE_URL}/${id}`),
 
-  getVotersByVoteId: (voteId) => api.get(`${BASE_URL}/vote/${voteId}`),
+  getVotersByVoteId: (voteId) => http.get(`${BASE_URL}/vote/${voteId}`),
 
-  getVotersByMemberId: (memberId) => api.get(`${BASE_URL}/member/${memberId}`),
+  getVotersByMemberId: (memberId) => http.get(`${BASE_URL}/member/${memberId}`),
 
   /** --- Command --- */
-  createVoter: (voterDto) => api.post(`${BASE_URL}`, voterDto),
+  createVoter: (voterDto) => http.post(`${BASE_URL}`, voterDto),
 
-  deleteVoter: (id) => api.delete(`${BASE_URL}/${id}`),
+  deleteVoter: (id) => http.delete(`${BASE_URL}/${id}`),
 };
 
 export default voterApi;

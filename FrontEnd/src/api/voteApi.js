@@ -1,31 +1,31 @@
 // src/api/voteApi.js
-import api from "./api";
+import http from "./http";
 
 const BASE_URL = "/vote";
 
 export const voteApi = {
   /** --- Query --- */
-  getAllVotes: () => api.get(`${BASE_URL}`),
+  getAllVotes: () => http.get(`${BASE_URL}`),
 
-  getVoteById: (id) => api.get(`${BASE_URL}/${id}`),
+  getVoteById: (id) => http.get(`${BASE_URL}/${id}`),
 
-  searchVotes: (searchDto) => api.post(`${BASE_URL}/search`, searchDto),
+  searchVotes: (searchDto) => http.post(`${BASE_URL}/search`, searchDto),
 
   getVotesByMemberId: (memberId) =>
-    api.get(`${BASE_URL}/member/${memberId}`),
+    http.get(`${BASE_URL}/member/${memberId}`),
 
   getVotesByChallengerId: (challengerId) =>
-    api.get(`${BASE_URL}/challenger/${challengerId}`),
+    http.get(`${BASE_URL}/challenger/${challengerId}`),
 
   /** --- Command --- */
-  createVote: (voteDto) => api.post(`${BASE_URL}`, voteDto),
+  createVote: (voteDto) => http.post(`${BASE_URL}`, voteDto),
 
-  updateVote: (id, voteDto) => api.patch(`${BASE_URL}/${id}`, voteDto),
+  updateVote: (id, voteDto) => http.patch(`${BASE_URL}/${id}`, voteDto),
 
   challengeVote: (id, voteDto) =>
-    api.patch(`${BASE_URL}/challenge/${id}`, voteDto),
+    http.patch(`${BASE_URL}/challenge/${id}`, voteDto),
 
-  deleteVote: (id) => api.delete(`${BASE_URL}/${id}`),
+  deleteVote: (id) => http.delete(`${BASE_URL}/${id}`),
 };
 
 export default voteApi;

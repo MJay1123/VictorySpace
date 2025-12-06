@@ -39,8 +39,4 @@ export const memberApi = {
     delete(id) {
         return http.delete(`/member/${id}`);
     },
-
-    login(data) {
-        return http.post('/member/login', data);
-    }
 };

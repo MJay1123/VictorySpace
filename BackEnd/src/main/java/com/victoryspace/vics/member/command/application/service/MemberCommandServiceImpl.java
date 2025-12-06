@@ -62,18 +62,4 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         MemberEntity deletedMemberEntity = memberRepository.save(entity);
         return memberCommandMapper.toDto(deletedMemberEntity);
     }
-
-    @Override
-    public MemberCommandDTO login(String email, String password) {
-        MemberEntity memberEntity = memberRepository.findByEmail(email);
-        if(memberEntity == null){
-            throw new EntityNotFoundException("Member not found");
-        } else {
-            if(password.equals(memberEntity.getPassword())){
-                return memberCommandMapper.toDto(memberEntity);
-            } else {
-                throw new RuntimeException("Wrong password");
-            }
-        }
-    }
 }

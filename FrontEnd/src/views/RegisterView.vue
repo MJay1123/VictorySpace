@@ -11,73 +11,35 @@
       <form @submit.prevent="handleRegister" class="register-form">
         <div class="form-group">
           <label for="reg-email">이메일</label>
-          <input
-            id="reg-email"
-            v-model="formData.email"
-            type="email"
-            placeholder="이메일을 입력하세요"
-            required
-            :disabled="isLoading"
-          />
+          <input id="reg-email" v-model="formData.email" type="email" placeholder="이메일을 입력하세요" required
+            :disabled="isLoading" />
         </div>
         <div class="form-group">
           <label for="name">이름</label>
-          <input
-            id="name"
-            v-model="formData.name"
-            type="text"
-            placeholder="이름을 입력하세요"
-            required
-            :disabled="isLoading"
-          />
+          <input id="name" v-model="formData.name" type="text" placeholder="이름을 입력하세요" required :disabled="isLoading" />
         </div>
         <div class="form-group">
           <label for="gender">성별</label>
-          <select
-            id="gender"
-            v-model="formData.gender"
-            required
-            :disabled="isLoading"
-          >
+          <select id="gender" v-model="formData.gender" required :disabled="isLoading">
             <option value="">선택하세요</option>
             <option value="M">남성</option>
             <option value="F">여성</option>
           </select>
         </div>
         <div class="form-group">
-          <label for="age">나이</label>
-          <input
-            id="age"
-            v-model.number="formData.age"
-            type="number"
-            placeholder="나이를 입력하세요"
-            min="1"
-            max="150"
-            required
-            :disabled="isLoading"
-          />
+          <label for="birthday">생년월일</label>
+          <input id="birthday" v-model="formData.birthday" type="date" required :disabled="isLoading"
+            max="9999-12-31" />
         </div>
         <div class="form-group">
           <label for="nickname">닉네임</label>
-          <input
-            id="nickname"
-            v-model="formData.nickname"
-            type="text"
-            placeholder="닉네임을 입력하세요"
-            required
-            :disabled="isLoading"
-          />
+          <input id="nickname" v-model="formData.nickname" type="text" placeholder="닉네임을 입력하세요" required
+            :disabled="isLoading" />
         </div>
         <div class="form-group">
           <label for="reg-password">비밀번호</label>
-          <input
-            id="reg-password"
-            v-model="formData.password"
-            type="password"
-            placeholder="비밀번호를 입력하세요"
-            required
-            :disabled="isLoading"
-          />
+          <input id="reg-password" v-model="formData.password" type="password" placeholder="비밀번호를 입력하세요" required
+            :disabled="isLoading" />
         </div>
         <button type="submit" class="register-button" :disabled="isLoading">
           {{ isLoading ? '처리 중...' : '회원가입' }}
@@ -95,16 +57,18 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import authApi from '../api/authApi'
 
 const router = useRouter()
+
 const formData = ref({
-  email: '',
-  name: '',
-  gender: '',
-  age: null,
-  nickname: '',
-  password: ''
-})
+  email: "",
+  name: "",
+  gender: "",
+  birthday: "",
+  nickname: "",
+  password: ""
+});
 
 const isLoading = ref(false)
 const errorMessage = ref('')
@@ -116,27 +80,23 @@ const handleRegister = async () => {
   successMessage.value = ''
 
   try {
-    const response = await fetch('http://localhost:8080/api/member', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData.value)
-    })
+    const response = await authApi.register(formData.value)
 
-    if (response.ok) {
-      successMessage.value = '회원가입이 완료되었습니다!'
-      // 2초 후 로그인 페이지로 이동
-      setTimeout(() => {
-        router.push('/login')
-      }, 2000)
-    } else {
-      const errorData = await response.json().catch(() => ({}))
-      errorMessage.value = errorData.message || '회원가입에 실패했습니다.'
-    }
+    successMessage.value = '회원가입이 완료되었습니다!'
+
+    setTimeout(() => {
+      router.push('/login')
+    }, 2000)
+
   } catch (error) {
-    console.error('회원가입 오류:', error)
-    errorMessage.value = '서버에 연결할 수 없습니다. 서버가 실행 중인지 확인해주세요.'
+    console.error("회원가입 오류:", error)
+
+    if (error.response?.data?.message) {
+      errorMessage.value = error.response.data.message
+    } else {
+      errorMessage.value = '회원가입에 실패했습니다.'
+    }
+
   } finally {
     isLoading.value = false
   }
@@ -262,4 +222,3 @@ const handleRegister = async () => {
   text-decoration: underline;
 }
 </style>
-

@@ -39,6 +39,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import authApi from '@/api/authApi.js'
 
 const router = useRouter()
 const email = ref('')
@@ -48,44 +49,25 @@ const isLoading = ref(false)
 const errorMessage = ref('')
 
 const handleLogin = async () => {
-  isLoading.value = true
-  errorMessage.value = ''
-
-  if (!email.value || !password.value) {
-    errorMessage.value = '이메일과 비밀번호를 입력해주세요.'
-    isLoading.value = false
-    return
-  }
+  isLoading.value = true;
+  errorMessage.value = '';
 
   try {
-    const response = await fetch('http://localhost:8080/api/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: new URLSearchParams({
-        email: email.value,
-        password: password.value
-      })
-    });
+    const response = await authApi.login(email.value, password.value);
 
-    if (response.ok) {
-      // 헤더에서 토큰 꺼내오기
-      const token = response.headers.get("Authorization");
+    if (response.status === 200) {
+
+      // 헤더에서 토큰 꺼내기
+      const token = response.headers['authorization'] || response.headers['Authorization'];
 
       if (token) {
+        // "Bearer " 붙어서 오니까 그대로 저장
         localStorage.setItem("token", token);
       }
 
-      if (token) {
-        // 2️⃣ localStorage에 저장 (Bearer 포함해야 함)
-        localStorage.setItem('token', token);
-      }
-
-      // 3️⃣ userInfo JSON body 가져오기 (있으면)
-      const userData = await response.json().catch(() => null);
-      if (userData) {
-        localStorage.setItem('userInfo', JSON.stringify(userData));
+      // response.data 안에 이메일, role 등 있으면 저장
+      if (response.data) {
+        localStorage.setItem("userInfo", JSON.stringify(response.data));
       }
 
       showWelcome.value = true;
@@ -93,19 +75,18 @@ const handleLogin = async () => {
       setTimeout(() => {
         router.push('/main')
       }, 1500);
-
-    } else {
-      // 백엔드에서 에러 반환
-      const errorData = await response.json().catch(() => ({}))
-      errorMessage.value = errorData.message || '로그인에 실패했습니다.'
     }
+
   } catch (error) {
-    console.error('로그인 오류:', error)
-    errorMessage.value = '서버에 연결할 수 없습니다. 서버가 실행 중인지 확인해주세요.'
+    console.error('로그인 오류:', error);
+    errorMessage.value = error.response?.data?.message || '로그인에 실패했습니다.';
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
-}
+};
+
+
+
 </script>
 
 <style scoped>
