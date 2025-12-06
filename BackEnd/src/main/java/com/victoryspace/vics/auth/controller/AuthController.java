@@ -20,12 +20,6 @@ public class AuthController {
     @PostMapping("/register")
     public String register(@RequestBody AuthDTO authDTO) {
         String result = authService.register(authDTO);
-        if(result.equals("emailExists")){
-            return "Email is already exists";
-        } else if(result.equals("nicknameExists")){
-            return "Nickname is already exists";
-        } else {
-            return "Join is finished! Your nickname is " + result;
-        }
+        return "Join is finished! Your nickname is " + result;
     }
 }
