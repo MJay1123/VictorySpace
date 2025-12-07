@@ -1,38 +1,25 @@
 // src/api/commentApi.js
 import http from './http';
 
+const BASE_URL = '/comment';
+
 export const commentApi = {
     
     /** ---------------------- Query API ---------------------- **/
 
-    getAllComments() {
-        return http.get('/comments');
-    },
+    findAll: () => http.get(`${BASE_URL}`),
 
-    getCommentById(id) {
-        return http.get(`/comments/${id}`);
-    },
+    findById: (id) => http.get(`${BASE_URL}/${id}`),
 
-    getCommentsByVoteId(voteId) {
-        return http.get(`/comments/vote/${voteId}`);
-    },
+    findByVoteId: (voteId) => http.get(`${BASE_URL}/vote/${voteId}`),
 
-    getCommentsByMemberId(memberId) {
-        return http.get(`/comments/member/${memberId}`);
-    },
-
+    findByMemberId: (memberId) => http.get(`${BASE_URL}/member/${memberId}`),
 
     /** ---------------------- Command API ---------------------- **/
 
-    createComment(data) {
-        return http.post('/comment', data);
-    },
+    createComment: (commentDTO) => http.post(`${BASE_URL}`, commentDTO),
 
-    updateComment(id, data) {
-        return http.patch(`/comment/${id}`, data);
-    },
+    updateComment: (id, commentDTO) => http.patch(`${BASE_URL}/${id}`, commentDTO),
 
-    deleteComment(id) {
-        return http.delete(`/comment/${id}`);
-    }
+    deleteComment: (id) => http.delete(`${BASE_URL}/${id}`),
 };

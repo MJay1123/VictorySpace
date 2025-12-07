@@ -31,6 +31,12 @@ public class MemberQueryServiceImpl implements MemberQueryService {
     }
 
     @Override
+    public MemberQueryDTO findByEmail(String email) {
+        MemberQueryDTO dto = mapper.findByEmail(email);
+        return dto;
+    }
+
+    @Override
     public List<MemberQueryDTO> order(String orderBy, String direction) {
         if(orderBy.equals("point")) {
             List<MemberQueryDTO> dtoList = mapper.orderByPoint(direction);

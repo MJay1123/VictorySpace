@@ -39,7 +39,7 @@ const onVoteCreated = () => {
 // --- 투표 목록 가져오기 (axios 적용) ---
 const fetchVotes = async () => {
   try {
-    const res = await voteApi.getAllVotes();
+    const res = await voteApi.findAll();
     votes.value = res.data;
   } catch (err) {
     console.error("투표 목록 불러오기 실패:", err);

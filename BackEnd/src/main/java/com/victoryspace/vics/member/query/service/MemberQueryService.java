@@ -13,4 +13,6 @@ public interface MemberQueryService {
     List<MemberQueryDTO> findByNickname(String nickname);
 
     List<MemberQueryDTO> order(String orderBy, String direction);
+
+    MemberQueryDTO findByEmail(String email);
 }

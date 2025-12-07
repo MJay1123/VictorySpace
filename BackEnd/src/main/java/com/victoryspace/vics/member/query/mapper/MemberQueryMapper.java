@@ -13,5 +13,7 @@ public interface MemberQueryMapper {
 
     List<MemberQueryDTO> findByNickname(String nickname);
 
+    MemberQueryDTO findByEmail(String email);
+
     List<MemberQueryDTO> orderByPoint(String direction);
 }

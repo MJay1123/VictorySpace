@@ -52,6 +52,7 @@ import { ref, watch } from 'vue';
 import voteApi from '../../api/voteApi';
 import voterApi from '../../api/voterApi';
 import { categoryApi } from '../../api/categoryApi';
+import memberApi from '../../api/memberApi';
 
 const props = defineProps({
     voteId: Number,
@@ -71,21 +72,21 @@ const user = JSON.parse(localStorage.getItem('userInfo'))
 // 👉 1) 투표 여부 확인 API
 async function fetchUserVote() {
     try {
-        if (!user || !user.id) {
+        if (!user) {
             userVote.value = null;
             return;
         }
-
-        const res = await voterApi.getVoterByVoteAndMemberId(props.voteId, user.id);
+        const memberDTO = await memberApi.findByEmail(user.email);
+        const userId = memberDTO.data.id;
+        const res = await voterApi.findByVoteAndMemberId(props.voteId, userId);
 
         if (res.status === 404) {
             userVote.value = null;
             return;
         }
+        userVote.value = res.data;
 
-        // body가 비어있지 않을 때만 파싱
-        const text = await res.data;
-        userVote.value = text ? JSON.parse(text) : null;
+        await refreshData();
 
     } catch (err) {
         console.error("투표 여부 확인 실패", err);
@@ -96,7 +97,7 @@ async function fetchUserVote() {
 // 👉 2) 투표 정보 GET
 async function fetchVoteDetail(id) {
     try {
-        const res = await voteApi.getVoteById(id);
+        const res = await voteApi.findById(id);
         vote.value = res.data;
 
         if (vote.value?.categoryId) {
@@ -111,7 +112,7 @@ async function fetchVoteDetail(id) {
 // 카테고리 정보 GET
 async function fetchCategory(categoryId) {
     try {
-        const res = await categoryApi.getAllCategories();
+        const res = await categoryApi.findAll();
 
         const categories = res.data; // 전체 배열
 
@@ -124,7 +125,7 @@ async function fetchCategory(categoryId) {
 
 // 👉 3) 전체 투표자 GET
 async function fetchVoters(voteId) {
-    const res = await voterApi.getVotersByVoteId(voteId);
+    const res = await voterApi.findByVoteId(voteId);
     voters.value = await res.data;
 
     homeCount.value = voters.value.filter(v => v.content === 'home').length
@@ -135,41 +136,40 @@ async function fetchVoters(voteId) {
 
 // 👉 4) 투표 등록
 const voteChoice = async (side) => {
-    if (!user || !user.id) {
+    if (!user) {
         alert("로그인이 필요합니다.");
         return;
     }
+    try {
+        const memberDTO = await memberApi.findByEmail(user.email);
+        const userId = memberDTO.data.id;
 
-    const res = await fetch('http://localhost:8080/api/voter', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+        await voterApi.createVoter({
             voteId: props.voteId,
-            memberId: user.id,
+            memberId: userId,
             content: selectedOption.value
-        })
-    });
+        });
 
-    if (!res.ok) {
-        const msg = await res.text();
-        console.error("서버 오류:", msg);
-        throw new Error("투표 실패 ❌");
+        await refreshData;
+
+    } catch (err) {
+        console.error("투표 실패:", err);
+        alert("투표 중 오류가 발생했습니다.");
     }
-
-    await refreshData();
-};
+}
 
 // 👉 5) 투표 취소
+
 async function cancelVote() {
-    if (!userVote.value) return;
+  if (!userVote.value) return;
 
-    const res = await fetch(`http://localhost:8080/api/voter/${userVote.value.id}`, {
-        method: 'DELETE'
-    });
-
-    if (!res.ok) return alert("삭제 실패!");
-
+  try {
+    await voterApi.deleteVoter(userVote.value.id);
     await refreshData();
+  } catch (e) {
+    alert("삭제 실패!");
+    console.error(e);
+  }
 }
 
 // 공통 새로고침

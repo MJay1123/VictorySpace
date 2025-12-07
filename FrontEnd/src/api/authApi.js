@@ -13,18 +13,8 @@ export const authApi = {
 
     // 로그인
     login: (email, password) =>
-        http.post(
-            `${BASE_URL}/login`,
-            new URLSearchParams({
-                email: email,
-                password: password,
-            }),
-            {
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                    Authorization: ""
-                },
-            }
+        http.post(`${BASE_URL}/login`,
+            new URLSearchParams({ email, password })
         ),
 };
 

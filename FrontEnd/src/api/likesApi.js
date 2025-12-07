@@ -1,34 +1,29 @@
-// src/api/likesApi.js
 import http from './http';
+
+const BASE_URL = '/likes';
 
 export const likesApi = {
 
     /** ---------------------- Query ---------------------- **/
 
-    getAll() {
-        return http.get('/likes');
-    },
+    // 전체 조회
+    findAll: () => http.get(`${BASE_URL}`),
 
-    getById(id) {
-        return http.get(`/likes/${id}`);
-    },
+    // ID로 조회
+    findById: (id) => http.get(`${BASE_URL}/${id}`),
 
-    getByVoteId(voteId) {
-        return http.get(`/likes/vote/${voteId}`);
-    },
+    // voteId로 조회
+    findByVoteId: (voteId) => http.get(`${BASE_URL}/vote/${voteId}`),
 
-    getByMemberId(memberId) {
-        return http.get(`/likes/member/${memberId}`);
-    },
+    // memberId로 조회
+    findByMemberId: (memberId) => http.get(`${BASE_URL}/member/${memberId}`),
 
 
     /** ---------------------- Command ---------------------- **/
 
-    create(data) {
-        return http.post('/likes', data);
-    },
+    // 좋아요 생성
+    createLike: (likesDTO) => http.post(`${BASE_URL}`, likesDTO),
 
-    delete(id) {
-        return http.delete(`/likes/${id}`);
-    }
+    // 좋아요 삭제
+    deleteLike: (id) => http.delete(`${BASE_URL}/${id}`)
 };

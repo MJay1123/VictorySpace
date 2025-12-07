@@ -30,6 +30,11 @@ public class MemberQueryController {
     public List<MemberQueryDTO> findByNickname(@RequestParam String nickname){
         return memberQueryService.findByNickname(nickname);
     }
+    @GetMapping("/email")
+    public MemberQueryDTO findByEmail(@RequestParam String email){
+        return memberQueryService.findByEmail(email);
+    }
+
     @GetMapping("/order")
     public List<MemberQueryDTO> order(@RequestParam String orderBy, @RequestParam String direction){
         return memberQueryService.order(orderBy, direction);

@@ -78,6 +78,25 @@
         WHERE nickname LIKE CONCAT('%', #{nickname}, '%')
     </select>
 
+    <select id="findByEmail" resultMap="MemberResultMap">
+        SELECT id,
+               name,
+               gender,
+               birthday,
+               nickname,
+               password,
+               email,
+               created_at,
+               updated_at,
+               deleted_at,
+               grade_id,
+               profile,
+               point,
+               role
+        FROM member
+        WHERE email = #{email}
+    </select>
+
     <select id="orderByPoint" resultMap="MemberResultMap">
         SELECT id,
         name,

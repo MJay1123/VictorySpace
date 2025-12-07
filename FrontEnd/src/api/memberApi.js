@@ -1,42 +1,46 @@
 // src/api/memberApi.js
 import http from './http';
 
+const BASE_URL = "/member";
+
 export const memberApi = {
 
     /** ---------------------- Query ---------------------- **/
 
-    getAll() {
-        return http.get('/member');
-    },
+    findAll: () => http.get(`${BASE_URL}`),
 
-    getById(id) {
-        return http.get(`/member/${id}`);
-    },
+    findById: (id) => http.get(`${BASE_URL}/${id}`),
 
-    findByNickname(nickname) {
-        return http.get(`/member/nickname`, {
+    findByNickname: (nickname) =>
+        http.get(`${BASE_URL}/nickname`, {
             params: { nickname }
-        });
-    },
+        }),
 
-    order(orderBy, direction) {
-        return http.get(`/member/order`, {
+    // 이메일로 검색
+    findByEmail: (email) =>
+        http.get(`${BASE_URL}/email`, {
+            params: { email }
+        }),
+
+    // 정렬 조회
+    order: (orderBy, direction) =>
+        http.get(`${BASE_URL}/order`, {
             params: { orderBy, direction }
-        });
-    },
-
+        }),
 
     /** ---------------------- Command ---------------------- **/
 
-    create(data) {
-        return http.post('/member', data);
-    },
+    // 회원 생성
+    createMember: (memberDTO) =>
+        http.post(`${BASE_URL}`, memberDTO),
 
-    update(id, data) {
-        return http.patch(`/member/${id}`, data);
-    },
+    // 회원 수정 (PATCH)
+    updateMember: (id, memberDTO) =>
+        http.patch(`${BASE_URL}/${id}`, memberDTO),
 
-    delete(id) {
-        return http.delete(`/member/${id}`);
-    },
+    // 회원 삭제
+    deleteMember: (id) =>
+        http.delete(`${BASE_URL}/${id}`)
 };
+
+export default memberApi;

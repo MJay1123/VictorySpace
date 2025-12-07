@@ -5,7 +5,7 @@ const BASE_URL = "/category";
 export const categoryApi = {
 
   /** --- Query --- */
-  getAllCategories: () => http.get(`${BASE_URL}`),
+  findAll: () => http.get(`${BASE_URL}`),
 
 }
 

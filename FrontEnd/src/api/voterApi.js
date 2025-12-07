@@ -5,18 +5,18 @@ const BASE_URL = "/voter";
 
 export const voterApi = {
   /** --- Query --- */
-  getAllVoters: () => http.get(`${BASE_URL}`),
+  findAll: () => http.get(`${BASE_URL}`),
 
-  getVoterById: (id) => http.get(`${BASE_URL}/${id}`),
+  findById: (id) => http.get(`${BASE_URL}/${id}`),
 
-  getVotersByVoteId: (voteId) => http.get(`${BASE_URL}/vote/${voteId}`),
+  findByVoteId: (voteId) => http.get(`${BASE_URL}/vote/${voteId}`),
 
-  getVotersByMemberId: (memberId) => http.get(`${BASE_URL}/member/${memberId}`),
+  findByMemberId: (memberId) => http.get(`${BASE_URL}/member/${memberId}`),
 
-  getVoterByVoteAndMemberId: (voteId, memberId) => http.get(`${BASE_URL}/vote/${voteId}/member/${memberId}`),
+  findByVoteAndMemberId: (voteId, memberId) => http.get(`${BASE_URL}/vote/${voteId}/member/${memberId}`),
 
   /** --- Command --- */
-  createVoter: (voterDto) => http.post(`${BASE_URL}`, voterDto),
+  createVoter: (voterDTO) => http.post(`${BASE_URL}`, voterDTO),
 
   deleteVoter: (id) => http.delete(`${BASE_URL}/${id}`),
 };

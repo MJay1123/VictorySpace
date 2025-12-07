@@ -1,23 +1,26 @@
-// src/api/voteApi.js
 import http from "./http";
 
 const BASE_URL = "/vote";
 
 export const voteApi = {
-  /** --- Query --- */
-  getAllVotes: () => http.get(`${BASE_URL}`),
 
-  getVoteById: (id) => http.get(`${BASE_URL}/${id}`),
+  /** ---------------------- Query ---------------------- **/
 
-  searchVotes: (searchDto) => http.post(`${BASE_URL}/search`, searchDto),
+  findAll: () => http.get(`${BASE_URL}`),
 
-  getVotesByMemberId: (memberId) =>
+  findById: (id) => http.get(`${BASE_URL}/${id}`),
+
+  search: (searchDto) => http.post(`${BASE_URL}/search`, searchDto),
+
+  findByMemberId: (memberId) =>
     http.get(`${BASE_URL}/member/${memberId}`),
 
-  getVotesByChallengerId: (challengerId) =>
+  findByChallengerId: (challengerId) =>
     http.get(`${BASE_URL}/challenger/${challengerId}`),
 
-  /** --- Command --- */
+
+  /** ---------------------- Command ---------------------- **/
+
   createVote: (voteDto) => http.post(`${BASE_URL}`, voteDto),
 
   updateVote: (id, voteDto) => http.patch(`${BASE_URL}/${id}`, voteDto),
