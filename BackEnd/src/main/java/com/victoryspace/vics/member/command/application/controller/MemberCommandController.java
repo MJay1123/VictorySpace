@@ -32,13 +32,4 @@ public class MemberCommandController {
         MemberCommandDTO deletedMemberCommandDTO = memberCommandService.deleteMember(id);
         return deletedMemberCommandDTO;
     }
-
-    @PostMapping("/login")
-    public MemberCommandDTO login(@RequestBody MemberCommandDTO memberCommandDTO) {
-        String email = memberCommandDTO.getEmail();
-        String password = memberCommandDTO.getPassword();
-        MemberCommandDTO loginDTO = memberCommandService.login(email, password);
-        return loginDTO;
-    }
-
 }

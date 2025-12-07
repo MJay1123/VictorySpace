@@ -3,8 +3,10 @@ package com.victoryspace.vics.auth.service;
 import com.victoryspace.vics.auth.dto.AuthDTO;
 import com.victoryspace.vics.member.command.domain.aggregate.MemberEntity;
 import com.victoryspace.vics.member.command.domain.repository.MemberRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -23,12 +25,12 @@ public class AuthService {
         String email = authDTO.getEmail();
         boolean emailExists = memberRepository.existsByEmail(email);
         if(emailExists){
-            return "emailExists";
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already exists");
         }
         String nickname =  authDTO.getNickname();
         boolean nicknameExists = memberRepository.existsByNickname(nickname);
         if(nicknameExists){
-            return "nicknameExists";
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nickname already exists");
         }
         String name = authDTO.getName();
         String gender = authDTO.getGender();
@@ -39,11 +41,12 @@ public class AuthService {
         memberEntity.setGender(gender);
         memberEntity.setBirthday(birthday);
         memberEntity.setNickname(nickname);
-        memberEntity.setEmail(email);
         memberEntity.setPassword(bCryptPasswordEncoder.encode(password));
+        memberEntity.setEmail(email);
         memberEntity.setCreatedAt(LocalDateTime.now());
         memberEntity.setGradeId(1);
         memberEntity.setPoint(1000);
+        memberEntity.setRole("ROLE_USER");
         MemberEntity createdEntity = memberRepository.save(memberEntity);
         return createdEntity.getNickname();
     }

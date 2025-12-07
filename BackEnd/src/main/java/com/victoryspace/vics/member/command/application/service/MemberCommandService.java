@@ -8,6 +8,4 @@ public interface MemberCommandService {
     MemberCommandDTO updateMember(Integer id, MemberCommandDTO memberCommandDTO);
 
     MemberCommandDTO deleteMember(Integer id);
-
-    MemberCommandDTO login(String email, String password);
 }
