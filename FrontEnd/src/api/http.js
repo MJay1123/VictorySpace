@@ -14,7 +14,7 @@ http.interceptors.request.use((config) => {
 
     if (!publicUrls.includes(config.url)) {
         if (user?.token) {
-            config.headers.Authorization = `${user.token}`;
+            config.headers.Authorization = `Bearer ${user.token}`;
         }
     }
 

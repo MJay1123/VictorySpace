@@ -49,6 +49,9 @@
 
 <script setup>
 import { ref, watch } from 'vue';
+import voteApi from '../../api/voteApi';
+import voterApi from '../../api/voterApi';
+import { categoryApi } from '../../api/categoryApi';
 
 const props = defineProps({
     voteId: Number,
@@ -73,7 +76,7 @@ async function fetchUserVote() {
             return;
         }
 
-        const res = await fetch(`http://localhost:8080/api/voter/vote/${props.voteId}/member/${user.id}`);
+        const res = await voterApi.getVoterByVoteAndMemberId(props.voteId, user.id);
 
         if (res.status === 404) {
             userVote.value = null;
@@ -81,7 +84,7 @@ async function fetchUserVote() {
         }
 
         // body가 비어있지 않을 때만 파싱
-        const text = await res.text();
+        const text = await res.data;
         userVote.value = text ? JSON.parse(text) : null;
 
     } catch (err) {
@@ -92,16 +95,26 @@ async function fetchUserVote() {
 
 // 👉 2) 투표 정보 GET
 async function fetchVoteDetail(id) {
-    const res = await fetch(`http://localhost:8080/api/vote/${id}`);
-    vote.value = await res.json();
+    try {
+        const res = await voteApi.getVoteById(id);
+        vote.value = res.data;
+
+        if (vote.value?.categoryId) {
+            await fetchCategory(vote.value.categoryId);
+        }
+
+    } catch (err) {
+        console.error("투표 상세 불러오기 실패:", err);
+    }
 }
 
+// 카테고리 정보 GET
 async function fetchCategory(categoryId) {
     try {
-        const res = await fetch(`http://localhost:8080/api/category`);
-        if (!res.ok) throw new Error('카테고리 불러오기 실패');
+        const res = await categoryApi.getAllCategories();
 
-        const categories = await res.json(); // 전체 배열
+        const categories = res.data; // 전체 배열
+
         category.value = categories.find(c => c.id === categoryId) || null; // 일치하는 것 하나만
     } catch (err) {
         console.error(err);
@@ -111,8 +124,8 @@ async function fetchCategory(categoryId) {
 
 // 👉 3) 전체 투표자 GET
 async function fetchVoters(voteId) {
-    const res = await fetch(`http://localhost:8080/api/voter/vote/${voteId}`);
-    voters.value = await res.json();
+    const res = await voterApi.getVotersByVoteId(voteId);
+    voters.value = await res.data;
 
     homeCount.value = voters.value.filter(v => v.content === 'home').length
     awayCount.value = voters.value.filter(v => v.content === 'away').length

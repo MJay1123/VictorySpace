@@ -13,6 +13,8 @@ export const voterApi = {
 
   getVotersByMemberId: (memberId) => http.get(`${BASE_URL}/member/${memberId}`),
 
+  getVoterByVoteAndMemberId: (voteId, memberId) => http.get(`${BASE_URL}/vote/${voteId}/member/${memberId}`),
+
   /** --- Command --- */
   createVoter: (voterDto) => http.post(`${BASE_URL}`, voterDto),
 
