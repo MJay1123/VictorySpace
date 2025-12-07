@@ -66,16 +66,45 @@
             <div class="comments-section">
                 <h3 class="comment-title">💬 댓글</h3>
 
+                <div class="write-comment">
+                    <textarea v-model="newComment" placeholder="댓글을 입력하세요"></textarea>
+                    <button @click="submitComment" :disabled="!newComment.trim()">작성</button>
+                </div>
+
                 <div v-if="comments.length === 0" class="no-comment">아직 댓글이 없습니다 😁</div>
 
                 <div class="comment-list">
                     <div class="comment-item" v-for="comment in comments" :key="comment.id">
-                        <div class="comment-left">
-                            👤 {{ comment.nickname ?? `사용자 ${comment.memberId}` }}
-                        </div>
+                        <div class="comment-left">👤 {{ comment.nickname }}</div>
                         <div class="comment-right">
-                            <div class="comment-content">{{ comment.content }}</div>
-                            <div class="comment-meta">{{ formatDate(comment.createdAt) }}</div>
+
+                            <!-- 수정 중일 때 -->
+                            <div v-if="editingCommentId === comment.id">
+                                <textarea v-model="editContent"></textarea>
+                                <button class="save-btn" @click="saveEdit(comment.id)">저장</button>
+                                <button class="cancel-btn" @click="cancelEdit">취소</button>
+                            </div>
+
+                            <!-- 일반 표시 -->
+                            <div v-else>
+                                <!-- 🔥 삭제된 경우 -->
+                                <span v-if="comment.deletedAt !== null" class="deleted-text">
+                                    삭제된 댓글입니다.
+                                </span>
+
+                                <!-- 🔥 정상 댓글 -->
+                                <span v-else>
+                                    {{ comment.content }}
+                                </span>
+                                <div class="comment-meta">{{ formatDate(comment.createdAt) }}</div>
+
+                                <!-- 작성자만 수정/삭제 가능 -->
+                                <div class="comment-actions"
+                                    v-if="comment.memberId === userId && comment.deletedAt === null">
+                                    <button class="edit-btn" @click="startEdit(comment)">수정</button>
+                                    <button class="delete-btn" @click="deleteComment(comment.id)">삭제</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -99,6 +128,8 @@ const props = defineProps({
 });
 
 const vote = ref({})
+const voteOwnerNickname = ref("");
+const challengerNickname = ref("");
 const voters = ref([])
 const userVote = ref(null)
 const selectedOption = ref('home') // 기본 선택값
@@ -107,10 +138,14 @@ const awayCount = ref(0)
 const neutralCount = ref(0)
 const category = ref(null)
 const comments = ref([])
-const voteOwnerNickname = ref("");
-const challengerNickname = ref("");
+const newComment = ref("");
+const editingCommentId = ref(null);
+const editContent = ref("");
+const userId = ref(null);
+
 
 const user = JSON.parse(localStorage.getItem('userInfo'))
+
 // 날짜 formatting
 const formatDate = (dateString) => {
     if (!dateString) return "";
@@ -131,6 +166,14 @@ const formatDate = (dateString) => {
 };
 
 
+// 로그인 정보 가져오기
+async function fetchUserId() {
+    if (!user) return;
+    const res = await memberApi.findByEmail(user.email);
+    userId.value = res.data.id;
+}
+
+
 // 👉 1) 투표 여부 확인 API
 async function fetchUserVote() {
     try {
@@ -138,11 +181,9 @@ async function fetchUserVote() {
             userVote.value = null;
             return;
         }
-        const memberDTO = await memberApi.findByEmail(user.email);
-        const userId = memberDTO.data.id;
 
         try {
-            const res = await voterApi.findByVoteAndMemberId(props.voteId, userId);
+            const res = await voterApi.findByVoteAndMemberId(props.voteId, userId.value);
             userVote.value = res?.data ?? null;
         } catch (err) {
             userVote.value = null;
@@ -210,28 +251,6 @@ async function fetchVoters(voteId) {
     }
 }
 
-async function fetchComments() {
-    if (!vote.value?.id) return;
-    try {
-        const res = await commentApi.findByVoteId(vote.value.id);
-        const list = res.data;
-
-        // 🔥 memberId → nickname 변환
-        for (const comment of list) {
-            try {
-                const memberDTO = await memberApi.findById(comment.memberId);
-                comment.nickname = memberDTO.data.nickname;
-            } catch {
-                comment.nickname = "알 수 없음";
-            }
-        }
-        comments.value = list;
-    } catch (err) {
-        console.error("댓글 조회 실패:", err);
-    }
-}
-
-
 // 👉 4) 투표 등록
 const voteChoice = async () => {
     if (!selectedOption.value) return alert("옵션을 선택해야 합니다!");
@@ -241,12 +260,9 @@ const voteChoice = async () => {
         return;
     }
     try {
-        const memberDTO = await memberApi.findByEmail(user.email);
-        const userId = memberDTO.data.id;
-
         await voterApi.createVoter({
             voteId: props.voteId,
-            memberId: userId,
+            memberId: userId.value,
             content: selectedOption.value
         });
 
@@ -285,10 +301,8 @@ const challengeVote = async () => {
         const inputContent = prompt('도전 내용을 입력하세요');
         if (!inputContent) return;
 
-        const memberDTO = await memberApi.findByEmail(user.email);
-        const userId = memberDTO.data.id;
         const voteDTO = {
-            challengerId: userId,
+            challengerId: userId.value,
             challengerContent: inputContent
         }
         const res = await voteApi.challengeVote(vote.value.id, voteDTO)
@@ -301,8 +315,76 @@ const challengeVote = async () => {
     }
 };
 
+async function fetchComments() {
+    if (!vote.value?.id) return;
+    try {
+        const res = await commentApi.findByVoteId(vote.value.id);
+        const list = res.data;
+
+        // 🔥 memberId → nickname 변환
+        for (const comment of list) {
+            try {
+                const memberDTO = await memberApi.findById(comment.memberId);
+                comment.nickname = memberDTO.data.nickname;
+            } catch {
+                comment.nickname = "알 수 없음";
+            }
+        }
+        comments.value = list;
+    } catch (err) {
+        console.error("댓글 조회 실패:", err);
+    }
+}
+
+/** 📌 댓글 작성 */
+const submitComment = async () => {
+    if (!newComment.value.trim()) return;
+
+    await commentApi.createComment({
+        voteId: props.voteId,
+        memberId: userId.value,
+        content: newComment.value
+    });
+
+    newComment.value = "";
+    await fetchComments(); // 🔥 작성 후 즉시 새로고침
+};
+
+/** 📌 댓글 수정 시작 */
+const startEdit = (comment) => {
+    editingCommentId.value = comment.id;
+    editContent.value = comment.content;
+};
+
+/** 📌 수정 취소 */
+const cancelEdit = () => {
+    editingCommentId.value = null;
+    editContent.value = "";
+};
+
+/** 📌 수정 저장 */
+const saveEdit = async (id) => {
+    if (!editContent.value.trim()) return;
+
+    await commentApi.updateComment(id, { content: editContent.value });
+
+    editingCommentId.value = null;
+    editContent.value = "";
+
+    await fetchComments();
+};
+
+/** 📌 댓글 삭제 */
+const deleteComment = async (id) => {
+    if (!confirm("삭제하시겠습니까?")) return;
+
+    await commentApi.deleteComment(id);
+    await fetchComments();
+};
+
 // 공통 새로고침
 const refreshData = async () => {
+    await fetchUserId();
     await fetchVoteDetail(props.voteId);
     await fetchVoteOwnerInfo();
     await fetchChallengerInfo();
@@ -334,7 +416,6 @@ watch(() => props.voteId, () => refreshData(), { immediate: true });
     background: #ffffff;
     padding: 40px;
     width: 1300px;
-    /* 기존 대비 2배 */
     max-height: 90vh;
     overflow-y: auto;
     border-radius: 20px;
@@ -387,6 +468,8 @@ watch(() => props.voteId, () => refreshData(), { immediate: true });
     color: #333;
 }
 
+/* ===== 투표 UI ===== */
+
 .competition {
     display: flex;
     justify-content: space-between;
@@ -394,7 +477,6 @@ watch(() => props.voteId, () => refreshData(), { immediate: true });
     margin: 35px 0;
 }
 
-/* ---- 기본 영역 스타일 ---- */
 .side {
     flex: 1;
     padding: 25px;
@@ -407,7 +489,7 @@ watch(() => props.voteId, () => refreshData(), { immediate: true });
     border: 2px solid transparent;
 }
 
-/* ---- Home / Away / Neutral 색깔 적용 ---- */
+/* Home / Away / Neutral 기본 색 */
 .side.home {
     background: #e3efff;
 }
@@ -420,7 +502,7 @@ watch(() => props.voteId, () => refreshData(), { immediate: true });
     background: #e4ffe6;
 }
 
-/* ---- 선택 조건: 더 진하게 강조 ---- */
+/* 선택 시 강조 */
 .side.home.selected {
     border: 4px solid #2a65ff;
     background: #d8e4ff;
@@ -439,7 +521,7 @@ watch(() => props.voteId, () => refreshData(), { immediate: true });
     transform: scale(1.05);
 }
 
-/* ---- 라디오 버튼 확대 ---- */
+/* 라디오 버튼 크게 */
 input[type="radio"] {
     transform: scale(1.8);
     margin-top: 10px;
@@ -452,7 +534,7 @@ input[type="radio"] {
     font-size: 22px;
 }
 
-/* 투표 버튼 */
+/* ===== 투표 버튼 ===== */
 .vote-btn {
     width: 100%;
     background: #3b82f6;
@@ -472,47 +554,158 @@ input[type="radio"] {
     transform: translateY(-3px);
 }
 
-/* 댓글 영역 */
-.comment-title {
+/* ===== 댓글 ===== */
+
+.comments-section {
     margin-top: 35px;
+}
+
+.comment-title {
     font-size: 26px;
-    font-weight: bold;
+    font-weight: 700;
     padding-bottom: 10px;
-    border-bottom: 3px solid #ddd;
+    border-bottom: 3px solid #eee;
+    margin-bottom: 16px;
+}
+
+.no-comment {
+    text-align: center;
+    color: #777;
+    font-style: italic;
+    margin: 12px 0;
+}
+
+.comment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 8px;
 }
 
 .comment-item {
     display: flex;
-    gap: 15px;
-    background: #f3f4f6;
+    gap: 16px;
+    align-items: flex-start;
+    background: #f8f9fa;
     padding: 18px;
     border-radius: 12px;
-    margin-top: 10px;
+    border: 1px solid #eef2f7;
     font-size: 18px;
 }
 
 .comment-left {
-    font-weight: bold;
-    width: 150px;
-    color: #333;
+    width: 160px;
+    font-weight: 700;
+    color: #2b6be6;
+    display: flex;
+    align-items: center;
 }
 
 .comment-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.comment-content {
     background: white;
     padding: 12px;
     border-radius: 10px;
-    flex: 1;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+    font-size: 18px;
+    line-height: 1.45;
 }
 
+.comment-meta {
+    font-size: 14px;
+    color: #777;
+}
+
+/* Fade animation */
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(-10px);
+        transform: scale(.95);
     }
 
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: scale(1);
     }
+}
+
+.write-comment {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.write-comment textarea {
+    flex: 1;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: 2px solid #ccc;
+}
+
+.write-comment button {
+    background: #3b82f6;
+    color: white;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.comment-actions {
+    margin-top: 8px;
+    display: flex;
+    gap: 12px;
+}
+
+.comment-actions button,
+.save-btn,
+.cancel-btn {
+    background: #eee;
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: none;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.edit-btn {
+    background: #ffe08a;
+}
+
+.delete-btn {
+    background: #ff9f9f;
+}
+
+.save-btn {
+    background: #6bdc7e;
+    color: white;
+}
+
+.cancel-btn {
+    background: #bbb;
+    color: white;
+}
+
+.comment-item textarea {
+    width: 100%;
+    min-height: 60px;
+    padding: 10px;
+    border-radius: 10px;
+    border: 2px solid #ccc;
+}
+
+.deleted-text {
+    color: #aaa;
+    font-style: italic;
+    user-select: none;
 }
 </style>
