@@ -63,16 +63,24 @@
             </button>
 
             <!-- Comments -->
-            <h3 class="comment-title">💬 댓글</h3>
+            <div class="comments-section">
+                <h3 class="comment-title">💬 댓글</h3>
 
-            <div v-if="comments.length === 0" class="no-comment">아직 댓글이 없습니다 😁</div>
+                <div v-if="comments.length === 0" class="no-comment">아직 댓글이 없습니다 😁</div>
 
-            <div class="comment-list">
-                <div class="comment-item" v-for="comment in comments" :key="comment.id">
-                    <div class="comment-left">👤 {{ comment.memberNickname || `사용자 ${comment.memberId}` }}</div>
-                    <div class="comment-right">{{ comment.content }}</div>
+                <div class="comment-list">
+                    <div class="comment-item" v-for="comment in comments" :key="comment.id">
+                        <div class="comment-left">
+                            👤 {{ comment.nickname ?? `사용자 ${comment.memberId}` }}
+                        </div>
+                        <div class="comment-right">
+                            <div class="comment-content">{{ comment.content }}</div>
+                            <div class="comment-meta">{{ formatDate(comment.createdAt) }}</div>
+                        </div>
+                    </div>
                 </div>
             </div>
+
         </div>
     </div>
 </template>
@@ -103,6 +111,25 @@ const voteOwnerNickname = ref("");
 const challengerNickname = ref("");
 
 const user = JSON.parse(localStorage.getItem('userInfo'))
+// 날짜 formatting
+const formatDate = (dateString) => {
+    if (!dateString) return "";
+
+    const date = new Date(dateString);
+
+    const year = String(date.getFullYear()).slice(2);
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    let hours = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const period = hours >= 12 ? "오후" : "오전";
+
+    if (hours > 12) hours -= 12;
+
+    return `${year}.${month}.${day} ${period} ${hours}:${minutes}`;
+};
+
 
 // 👉 1) 투표 여부 확인 API
 async function fetchUserVote() {
@@ -187,7 +214,18 @@ async function fetchComments() {
     if (!vote.value?.id) return;
     try {
         const res = await commentApi.findByVoteId(vote.value.id);
-        comments.value = res.data;
+        const list = res.data;
+
+        // 🔥 memberId → nickname 변환
+        for (const comment of list) {
+            try {
+                const memberDTO = await memberApi.findById(comment.memberId);
+                comment.nickname = memberDTO.data.nickname;
+            } catch {
+                comment.nickname = "알 수 없음";
+            }
+        }
+        comments.value = list;
     } catch (err) {
         console.error("댓글 조회 실패:", err);
     }
@@ -266,12 +304,13 @@ const challengeVote = async () => {
 // 공통 새로고침
 const refreshData = async () => {
     await fetchVoteDetail(props.voteId);
+    await fetchVoteOwnerInfo();
+    await fetchChallengerInfo();
     await fetchCategory(vote.value.categoryId);
     await fetchVoters(props.voteId);
     await fetchUserVote();
     await fetchComments();
-    await fetchVoteOwnerInfo();
-    await fetchChallengerInfo();
+
 };
 
 // voteId 변경 시 자동 reload
