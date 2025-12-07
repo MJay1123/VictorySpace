@@ -1,47 +1,57 @@
 <template>
     <div class="modal-overlay">
-        <div class="modal">
-            <button class="close-btn" @click="$emit('close')">X</button>
-            <h2>새 투표 만들기</h2>
+        <div class="modal-card">
 
-            <div class="form-group">
-                <label for="title">제목</label>
-                <input type="text" id="title" v-model="title" placeholder="제목을 입력하세요" />
+            <button class="close-btn" @click="$emit('close')">✕</button>
+
+            <h2 class="modal-title">새 투표 만들기</h2>
+
+            <div class="form">
+
+                <div class="form-group">
+                    <label>제목</label>
+                    <input type="text" v-model="title" placeholder="제목을 입력하세요" />
+                </div>
+
+                <div class="form-group">
+                    <label>카테고리</label>
+                    <select v-model="selectedCategoryId">
+                        <option disabled value="">카테고리를 선택하세요</option>
+                        <option v-for="cat in categories" :key="cat.id" :value="cat.id">
+                            {{ cat.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>내용</label>
+                    <textarea v-model="content" placeholder="내용을 입력하세요"></textarea>
+                </div>
+
+                <div class="form-group duration">
+                    <label>기간</label>
+                    <div class="duration-select">
+                        <select v-model="durationNumber">
+                            <option v-for="n in 30" :key="n" :value="n">{{ n }}</option>
+                        </select>
+                        <select v-model="durationUnit">
+                            <option value="h">시간</option>
+                            <option value="d">일</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="action-btn" @click="createVote">투표 생성</button>
             </div>
-
-            <div class="form-group">
-                <label for="category">카테고리</label>
-                <select id="category" v-model="selectedCategoryId">
-                    <option value="" disabled>카테고리를 선택하세요</option>
-                    <option v-for="cat in categories" :key="cat.id" :value="cat.id">
-                        {{ cat.name }}
-                    </option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="content">내용</label>
-                <textarea id="content" v-model="content" placeholder="내용을 입력하세요"></textarea>
-            </div>
-
-            <div class="form-group duration">
-                <label>기간</label>
-                <select v-model="durationNumber">
-                    <option v-for="n in 30" :key="n" :value="n">{{ n }}</option>
-                </select>
-                <select v-model="durationUnit">
-                    <option value="h">hour</option>
-                    <option value="d">day</option>
-                </select>
-            </div>
-
-            <button @click="createVote">투표 생성</button>
         </div>
     </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import categoryApi from '../../api/categoryApi';
+import memberApi from '../../api/memberApi';
+import voteApi from '../../api/voteApi';
 
 const title = ref('');
 const content = ref('');
@@ -56,9 +66,8 @@ const emit = defineEmits(['created'])
 // 카테고리 불러오기
 onMounted(async () => {
     try {
-        const res = await fetch('http://localhost:8080/api/category');
-        if (!res.ok) throw new Error('카테고리 불러오기 실패');
-        categories.value = await res.json();
+        const res = await categoryApi.findAll();
+        categories.value = await res.data;
     } catch (error) {
         console.error(error);
     }
@@ -73,87 +82,140 @@ const createVote = async () => {
 
     const duration = `${durationNumber.value}${durationUnit.value}`
 
+    const userDTO = await memberApi.findByEmail(user.email);
+    const userId = userDTO.data.id;
+
+    const voteDTO = {
+        title: title.value,
+        categoryId: selectedCategoryId.value,
+        content: content.value,
+        memberId: userId,
+        duration: duration
+    };
+
     try {
-        const res = await fetch('http://localhost:8080/api/vote', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                title: title.value,
-                categoryId: selectedCategoryId.value,
-                content: content.value,
-                memberId: user.id,
-                duration: duration
-            })
-        })
-
-        if (!res.ok) {
-            const msg = await res.text()
-            console.error('생성 실패:', msg)
-            return alert('투표 생성 실패!')
-        }
-
-        alert('투표가 생성되었습니다!')
-        emit('created')
+        await voteApi.createVote(voteDTO);
+        alert("투표가 생성되었습니다!");
+        emit("created");
     } catch (err) {
-        console.error(err)
-        alert('서버 오류!')
+        console.error(err);
+        alert("투표 생성 실패!");
     }
-}
+};
 </script>
 
 <style scoped>
 .modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
+    z-index: 900;
 }
 
-.modal {
+.modal-card {
+    width: 520px;
     background: white;
-    padding: 20px;
-    border-radius: 8px;
-    width: 400px;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+    position: relative;
+    animation: fadeIn 0.25s ease-out;
 }
 
 .close-btn {
-    float: right;
-    background: red;
-    color: white;
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    background: none;
     border: none;
+    font-size: 20px;
     cursor: pointer;
-    padding: 5px 10px;
+    color: #777;
 }
 
-label {
-    display: block;
-    margin-top: 10px;
+.modal-title {
+    text-align: center;
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 1.2rem;
+    color: #333;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.3rem;
+}
+
+.form-group label {
     font-weight: 500;
+    font-size: 0.95rem;
+    color: #444;
 }
 
 input,
 textarea,
 select {
     width: 100%;
-    padding: 5px;
-    margin-top: 5px;
-    box-sizing: border-box;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 2px solid #e0e0e0;
+    font-size: 1rem;
+    transition: all 0.25s;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: #667eea;
+    outline: none;
+    box-shadow: 0 0 6px rgba(102, 126, 234, 0.3);
+}
+
+textarea {
+    min-height: 90px;
 }
 
 .duration {
     display: flex;
-    gap: 10px;
-    align-items: center;
+    flex-direction: column;
 }
 
-button {
-    margin-top: 15px;
-    padding: 5px 10px;
+.duration-select {
+    display: flex;
+    gap: 10px;
+}
+
+.action-btn {
+    margin-top: 10px;
+    padding: 14px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: white;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border: none;
+    border-radius: 10px;
     cursor: pointer;
+    transition: 0.25s;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(118, 75, 162, 0.3);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 </style>

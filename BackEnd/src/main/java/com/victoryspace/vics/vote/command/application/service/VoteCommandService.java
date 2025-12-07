@@ -9,5 +9,5 @@ public interface VoteCommandService {
 
     VoteCommandDTO deleteVote(Integer id);
 
-    VoteCommandDTO challengeVote(Integer id, VoteCommandDTO voteCommandDTO);
+    VoteCommandDTO challengeVote(Integer voteId, VoteCommandDTO voteCommandDTO);
 }

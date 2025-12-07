@@ -25,8 +25,8 @@ export const voteApi = {
 
   updateVote: (id, voteDto) => http.patch(`${BASE_URL}/${id}`, voteDto),
 
-  challengeVote: (id, voteDto) =>
-    http.patch(`${BASE_URL}/challenge/${id}`, voteDto),
+  challengeVote: (voteId, voteDto) =>
+    http.patch(`${BASE_URL}/challenge/${voteId}`, voteDto),
 
   deleteVote: (id) => http.delete(`${BASE_URL}/${id}`),
 };

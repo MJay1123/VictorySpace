@@ -54,8 +54,8 @@ public class VoteCommandServiceImpl implements VoteCommandService {
     }
 
     @Override
-    public VoteCommandDTO challengeVote(Integer id, VoteCommandDTO voteCommandDTO) {
-        VoteEntity voteEntity = voteRepository.findById(id)
+    public VoteCommandDTO challengeVote(Integer voteId, VoteCommandDTO voteCommandDTO) {
+        VoteEntity voteEntity = voteRepository.findById(voteId)
                 .orElseThrow(() -> new EntityNotFoundException("Vote not found"));
         Integer challengerId = voteCommandDTO.getChallengerId();
         if(voteEntity.getMemberId() == challengerId){

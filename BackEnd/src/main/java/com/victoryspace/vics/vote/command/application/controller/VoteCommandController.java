@@ -27,9 +27,9 @@ public class VoteCommandController {
         return updatedVoteDTO;
     }
 
-    @PatchMapping("/challenge/{id}")
-    public VoteCommandDTO challegeVote(@PathVariable Integer id, @RequestBody VoteCommandDTO voteCommandDTO) {
-        VoteCommandDTO updatedVoteCommandDTO = voteCommandService.challengeVote(id, voteCommandDTO);
+    @PatchMapping("/challenge/{voteId}")
+    public VoteCommandDTO challegeVote(@PathVariable Integer voteId, @RequestBody VoteCommandDTO voteCommandDTO) {
+        VoteCommandDTO updatedVoteCommandDTO = voteCommandService.challengeVote(voteId, voteCommandDTO);
         return updatedVoteCommandDTO;
     }
 

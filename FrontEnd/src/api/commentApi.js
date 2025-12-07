@@ -23,3 +23,5 @@ export const commentApi = {
 
     deleteComment: (id) => http.delete(`${BASE_URL}/${id}`),
 };
+
+export default commentApi;
