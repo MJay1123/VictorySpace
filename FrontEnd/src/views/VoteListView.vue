@@ -3,7 +3,7 @@
     <h1 class="page-title">⚡ Vote List</h1>
     <button @click="openCreateVoteModal" class="create-btn">+ 새 투표 만들기</button>
 
-    <div v-for="vote in votes" :key="vote.id" class="vote-card" @click="openVoteDetailModal(vote.id)">
+    <div v-for="vote in votes" :key="vote.id" class="vote-card" @click="goVoteDetail(vote.id)">
 
       <div class="left">
         <h3 class="title">{{ vote.title }}</h3>
@@ -16,21 +16,20 @@
       </div>
     </div>
 
-    <VoteDetailModal v-if="selectedVoteId !== null" :vote-id="selectedVoteId" @close="closeVoteDetailModal" />
-
     <CreateVoteModal v-if="showCreateVoteModal" @close="closeCreateVoteModal" @created="onVoteCreated" />
   </div>
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router';
 import { ref, onMounted } from 'vue';
 import voteApi from '@/api/voteApi.js';
 import memberApi from '../api/memberApi';
-import VoteDetailModal from '@/components/modals/VoteDetailModal.vue';
-import CreateVoteModal from '@/components/modals/CreateVoteModal.vue';
+import CreateVoteModal from '@/components/vote/CreateVoteModal.vue';
+
+const router = useRouter();
 
 const votes = ref([]);
-const selectedVoteId = ref(null);
 
 const showCreateVoteModal = ref(false)
 const openCreateVoteModal = () => { showCreateVoteModal.value = true; };
@@ -86,15 +85,9 @@ onMounted(() => {
   fetchVotes();
 });
 
-const showVoteDetailModal = ref(false)
-const openVoteDetailModal = (id) => {
-  showVoteDetailModal.value = true;
-  selectedVoteId.value = id;
-};
-const closeVoteDetailModal = () => {
-  showVoteDetailModal.value = false;
-  selectedVoteId.value = null;
-};
+const goVoteDetail = (voteId) => {
+  router.push(`/main/votes/${voteId}`)
+}
 </script>
 
 <style scoped>

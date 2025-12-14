@@ -7,15 +7,16 @@ const http = axios.create({
 });
 
 http.interceptors.request.use((config) => {
-    const user = JSON.parse(localStorage.getItem("userInfo"));
+    const token = localStorage.getItem("token");
 
-    // 🔥 로그인이나 회원가입 같은 public API는 토큰을 붙이지 않는다
     const publicUrls = ["/auth/login", "/auth/register"];
 
-    if (!publicUrls.includes(config.url)) {
-        if (user?.token) {
-            config.headers.Authorization = `Bearer ${user.token}`;
-        }
+    const isPublic = publicUrls.some(url => config.url?.startsWith(url));
+
+    if (!isPublic && token) {
+        config.headers.Authorization = token.startsWith("Bearer")
+            ? token
+            : `Bearer ${token}`;
     }
 
     return config;

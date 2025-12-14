@@ -40,6 +40,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import authApi from '@/api/authApi.js'
+import memberApi from '../api/memberApi'
 
 const router = useRouter()
 const email = ref('')
@@ -53,29 +54,33 @@ const handleLogin = async () => {
   errorMessage.value = '';
 
   try {
-    const response = await authApi.login(email.value, password.value);
 
-    if (response.status === 200) {
+    const res = await authApi.login(email.value, password.value);
 
-      // 헤더에서 토큰 꺼내기
-      const token = response.headers['authorization'] || response.headers['Authorization'];
-
-      if (token) {
-        // "Bearer " 붙어서 오니까 그대로 저장
-        localStorage.setItem("token", token);
-      }
-
-      // response.data 안에 이메일, role 등 있으면 저장
-      if (response.data) {
-        localStorage.setItem("userInfo", JSON.stringify(response.data));
-      }
-
-      showWelcome.value = true;
-
-      setTimeout(() => {
-        router.push('/main')
-      }, 1500);
+    const token = res.headers['authorization'] || res.headers['Authorization'];
+    if (token) {
+      localStorage.setItem("token", token);
     }
+
+    const loginEmail = res.data.email;
+    const role = res.data.role;
+
+    const memberRes = await memberApi.findByEmail(loginEmail);
+
+    const userInfo = {
+      id: memberRes.data.id,
+      email: loginEmail,
+      nickname: memberRes.data.nickname,
+      role
+    }
+
+    localStorage.setItem('userInfo', JSON.stringify(userInfo))
+
+    showWelcome.value = true;
+
+    setTimeout(() => {
+      router.push('/main/votes')
+    }, 1500);
 
   } catch (error) {
     console.error('로그인 오류:', error);

@@ -5,9 +5,19 @@ import RegisterView from '../views/RegisterView.vue'
 import MainPage from '../views/MainPage.vue'
 import ProfileView from '../views/ProfileView.vue'
 import VoteListView from '../views/VoteListView.vue'
+import VoteDetailView from '../views/VoteDetailView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
+  scrollBehavior(to, from, savedPosition) {
+    // 뒤로가기면 이전 위치 유지
+    if (savedPosition) {
+      return savedPosition
+    }
+
+    // 그 외엔 항상 맨 위
+    return { top: 0 }
+  },
   routes: [
     {
       path: '/',
@@ -34,13 +44,15 @@ const router = createRouter({
       component: MainPage,
       children: [
         {
-          path: '',
-          redirect: '/main/votes'
+          path: 'votes',
+          name: 'VoteList',
+          component: VoteListView,
         },
         {
-          path: 'votes',
-          name: 'votes',
-          component: VoteListView
+          path: 'votes/:id',
+          name: 'VoteDetail',
+          component: VoteDetailView,
+          props: true,
         },
         {
           path: 'profile',
