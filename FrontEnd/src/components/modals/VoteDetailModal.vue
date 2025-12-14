@@ -2,8 +2,17 @@
     <div class="modal-overlay">
         <div class="modal-card">
 
-            <!-- Close -->
             <button class="close-btn" @click="$emit('close')">✕</button>
+
+            <!-- ⋮ 메뉴 버튼 -->
+            <div class="menu-wrapper" v-if="vote.challengerId === null">
+                <button class="menu-btn" @click="showMenu = !showMenu">⋮</button>
+
+                <div v-if="showMenu" class="menu-dropdown">
+                    <button @click="openUpdate">✏️ 수정</button>
+                    <button @click="openDelete">🗑 삭제</button>
+                </div>
+            </div>
 
             <!-- Title -->
             <h2 class="modal-title">{{ vote.title }}</h2>
@@ -109,9 +118,12 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
+
+    <UpdateVoteModal v-if="showUpdateModal" :vote="vote" @close="showUpdateModal = false" @updated="refreshData" />
+    <DeleteVoteModal v-if="showDeleteModal" :voteId="vote.id" @deleted="$emit('close')"
+        @close="showDeleteModal = false" />
 </template>
 
 
@@ -122,10 +134,18 @@ import voterApi from '../../api/voterApi';
 import categoryApi from '../../api/categoryApi';
 import commentApi from '../../api/commentApi';
 import memberApi from '../../api/memberApi';
+import UpdateVoteModal from './UpdateVoteModal.vue';
+import DeleteVoteModal from './DeleteVoteModal.vue';
+
+const emit = defineEmits(['close'])
 
 const props = defineProps({
     voteId: Number,
 });
+
+const showMenu = ref(false);
+const showUpdateModal = ref(false);
+const showDeleteModal = ref(false);
 
 const vote = ref({})
 const voteOwnerNickname = ref("");
@@ -142,6 +162,16 @@ const newComment = ref("");
 const editingCommentId = ref(null);
 const editContent = ref("");
 const userId = ref(null);
+
+const openUpdate = () => {
+    showMenu.value = false;
+    showUpdateModal.value = true;
+};
+
+const openDelete = () => {
+    showMenu.value = false;
+    showDeleteModal.value = true;
+};
 
 
 const user = JSON.parse(localStorage.getItem('userInfo'))
@@ -226,13 +256,31 @@ async function fetchCategory(categoryId) {
 }
 
 async function fetchVoteOwnerInfo() {
-    const res = await memberApi.findById(vote.value.memberId);
-    voteOwnerNickname.value = res.data.nickname;
+    if (!vote.value?.memberId) {
+        voteOwnerNickname.value = "";
+        return;
+    }
+    try {
+        const res = await memberApi.findById(vote.value.memberId);
+        voteOwnerNickname.value = res.data.nickname;
+    } catch (e) {
+        console.error("투표 생성자 조회 실패", e);
+        voteOwnerNickname.value = "";
+    }
 }
 
 async function fetchChallengerInfo() {
-    const res = await memberApi.findById(vote.value.challengerId);
-    challengerNickname.value = res.data.nickname;
+    if (!vote.value?.challengerId) {
+        challengerNickname.value = "";
+        return;
+    }
+    try {
+        const res = await memberApi.findById(vote.value.challengerId);
+        challengerNickname.value = res.data.nickname;
+    } catch (e) {
+        console.error("도전자 정보 조회 실패", e);
+        challengerNickname.value = "";
+    }
 }
 
 // 👉 3) 전체 투표자 GET
@@ -385,14 +433,19 @@ const deleteComment = async (id) => {
 // 공통 새로고침
 const refreshData = async () => {
     await fetchUserId();
-    await fetchVoteDetail(props.voteId);
+    await fetchVoteDetail(props.voteId); // ⭐ 먼저 vote
     await fetchVoteOwnerInfo();
-    await fetchChallengerInfo();
+
+    if (vote.value?.challengerId) {
+        await fetchChallengerInfo();
+    } else {
+        challengerNickname.value = "";
+    }
+
     await fetchCategory(vote.value.categoryId);
     await fetchVoters(props.voteId);
     await fetchUserVote();
     await fetchComments();
-
 };
 
 // voteId 변경 시 자동 reload
@@ -401,6 +454,44 @@ watch(() => props.voteId, () => refreshData(), { immediate: true });
 </script>
 
 <style scoped>
+.menu-wrapper {
+    position: absolute;
+    top: 70px;
+    right: 28px;
+}
+
+.menu-btn {
+    background: none;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: #555;
+}
+
+.menu-dropdown {
+    position: absolute;
+    top: 35px;
+    right: 0;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    z-index: 2000;
+}
+
+.menu-dropdown button {
+    width: 120px;
+    padding: 12px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.menu-dropdown button:hover {
+    background: #f1f3f5;
+}
+
 .modal-overlay {
     position: fixed;
     inset: 0;
