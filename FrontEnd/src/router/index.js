@@ -6,6 +6,7 @@ import MainPage from '../views/MainPage.vue'
 import ProfileView from '../views/ProfileView.vue'
 import VoteListView from '../views/VoteListView.vue'
 import VoteDetailView from '../views/VoteDetailView.vue'
+import PlaygroundView from '../views/PlaygroundView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -58,6 +59,11 @@ const router = createRouter({
           path: 'profile',
           name: 'profile',
           component: ProfileView
+        },
+        {
+          path: 'playground',
+          name: 'Playground',
+          component: PlaygroundView,
         }
       ]
     }

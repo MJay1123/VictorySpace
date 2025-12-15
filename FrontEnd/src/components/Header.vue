@@ -8,6 +8,7 @@
       <div class="left-buttons">
         <button @click="goHome" class="home-button">홈</button>
         <button @click="goProfile" class="profile-button">내 정보</button>
+        <button @click="goPlayground" class="playground-button">놀이터</button>
       </div>
 
       <button @click="openLogoutModal" class="logout-button">로그아웃</button>
@@ -30,6 +31,10 @@ const goHome = () => {
 
 const goProfile = () => {
   router.push('/main/profile')
+}
+
+const goPlayground = () => {
+  router.push('/main/playground')
 }
 
 const showLogoutModal = ref(false)
@@ -78,7 +83,8 @@ const closeLogoutModal = () => {
 }
 
 .home-button,
-.profile-button {
+.profile-button,
+.playground-button {
   padding: 0.75rem 1.5rem;
   background: white;
   color: #667eea;
