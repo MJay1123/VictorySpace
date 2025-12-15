@@ -45,9 +45,9 @@ build/libs/
 
 myapp-0.0.1-SNAPSHOT.jar
 
-cd 프로젝트경로/build/libs
+cd C:\Users\tjals\Programming\VictorySpace\BackEnd\build\libs
 
-java -jar myapp-0.0.1-SNAPSHOT.jar
+java -jar VicS-0.0.1-SNAPSHOT.jar
 
 netstat -ano | findstr :8080
 
