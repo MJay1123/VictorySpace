@@ -20,7 +20,7 @@
                 <p class="count">{{ counts.away }}표</p>
 
                 <label v-if="vote.challengerId">
-                    <input type="radio" value="away" v-model="selectedOption" :disabled="Boolean(userVote)" />
+                    <input type="radio" value="away" v-model="selectedOption" :disabled="Boolean(userVote?.id)" />
                     선택
                 </label>
 
@@ -35,7 +35,7 @@
                 <p class="count">{{ counts.neutral }}표</p>
 
                 <label>
-                    <input type="radio" value="neutral" v-model="selectedOption" :disabled="Boolean(userVote)" />
+                    <input type="radio" value="neutral" v-model="selectedOption" :disabled="Boolean(userVote?.id)" />
                     선택
                 </label>
             </div>
@@ -45,10 +45,28 @@
             @click="$emit(userVote ? 'cancel' : 'vote', selectedOption)">
             {{ userVote ? '투표 취소' : '투표하기' }}
         </button>
+
+        <div class="summary-graph">
+            <div class="bar home" :style="{ width: homeRate + '%' }">
+                Home {{ counts.home }}
+            </div>
+            <div class="bar away" :style="{ width: awayRate + '%' }">
+                Away {{ counts.away }}
+            </div>
+            <div class="bar neutral" :style="{ width: neutralRate + '%' }">
+                Neutral {{ counts.neutral }}
+            </div>
+        </div>
+
+        <button class="detail-btn" @click="$emit('detail')">
+            결과 자세히 보기
+        </button>
     </div>
 </template>
 
 <script setup>
+
+import { ref, computed } from 'vue'
 
 const props = defineProps({
     vote: Object,
@@ -62,11 +80,18 @@ const props = defineProps({
     }
 })
 
-defineEmits(['vote', 'cancel', 'challenge'])
-
-import { ref } from 'vue'
+defineEmits(['vote', 'cancel', 'challenge', 'detail'])
 
 const selectedOption = ref(null)
+
+const total = computed(() =>
+    props.counts.home + props.counts.away + props.counts.neutral
+)
+
+const homeRate = computed(() => total.value ? props.counts.home / total.value * 100 : 0)
+const awayRate = computed(() => total.value ? props.counts.away / total.value * 100 : 0)
+const neutralRate = computed(() => total.value ? props.counts.neutral / total.value * 100 : 0)
+
 
 </script>
 
@@ -155,5 +180,37 @@ input[type="radio"] {
 .vote-btn:hover {
     background: #245ad8;
     transform: translateY(-3px);
+}
+
+/* ==== 투표율 그래프 */
+.summary-graph {
+    margin-top: 24px;
+}
+
+.bar {
+    height: 32px;
+    margin: 8px 0;
+    color: white;
+    font-weight: bold;
+    padding-left: 12px;
+    display: flex;
+    align-items: center;
+}
+
+.bar.home {
+    background: #2a65ff
+}
+
+.bar.away {
+    background: #ff3b3b
+}
+
+.bar.neutral {
+    background: #1bbf4b
+}
+
+.detail-btn {
+    width: 100%;
+    margin-top: 16px;
 }
 </style>

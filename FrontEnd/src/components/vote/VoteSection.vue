@@ -18,7 +18,9 @@
 
         <!-- 투표 UI -->
         <VoteCompetition :vote="vote" :counts="counts" :userVote="userVote" @vote="handleVote" @cancel="cancelVote"
-            @challenge="challengeVote" />
+            @challenge="challengeVote" @detail="showGraphModal = true" />
+
+        <VotersGraphModal v-if="showGraphModal" :voteId="voteId" :voters="voters" @close="showGraphModal = false" />
 
         <!-- 수정 / 삭제 모달 -->
         <UpdateVoteModal v-if="showUpdateModal" :vote="vote" @close="showUpdateModal = false" @updated="refresh" />
@@ -34,6 +36,7 @@ import VoteCompetition from './VoteCompetition.vue'
 import VoteActionMenu from './VoteActionMenu.vue'
 import UpdateVoteModal from './UpdateVoteModal.vue'
 import DeleteVoteModal from './DeleteVoteModal.vue'
+import VotersGraphModal from './VotersGraphModal.vue'
 
 import voteApi from '@/api/voteApi'
 import voterApi from '../../api/voterApi'
@@ -57,6 +60,7 @@ const canEdit = computed(() => {
     // return true;
 })
 
+const showGraphModal = ref(false)
 const showUpdateModal = ref(false)
 const showDeleteModal = ref(false)
 const openUpdate = () => (showUpdateModal.value = true)
@@ -69,8 +73,8 @@ const refresh = async () => {
     vote.value = res.data
 
     if (vote.value.categoryId) {
-        const cats = await categoryApi.findAll()
-        category.value = cats.data.find(c => c.id === vote.value.categoryId)
+        const categoryRes = await categoryApi.findAll()
+        category.value = categoryRes.data.find(c => c.id === vote.value.categoryId)
     }
 
     const votersRes = await voterApi.findByVoteId(props.voteId)
@@ -84,7 +88,7 @@ const refresh = async () => {
     if (user) {
         try {
             const uv = await voterApi.findByVoteAndMemberId(props.voteId, user.id)
-            userVote.value = uv.data
+            userVote.value = uv.data || null
         } catch {
             userVote.value = null
         }
