@@ -37,3 +37,20 @@
 - `[fix] JWT 인증 오류 수정`
 - `[refactor] UserService 코드 정리`
 
+---
+
+## terminal로 project 실행
+
+build/libs/
+
+myapp-0.0.1-SNAPSHOT.jar
+
+cd C:\Users\tjals\Programming\VictorySpace\BackEnd\build\libs
+
+java -jar VicS-0.0.1-SNAPSHOT.jar
+
+netstat -ano | findstr :8080
+
+TCP    0.0.0.0:8080     0.0.0.0:0      LISTENING     12345
+
+taskkill /PID 12345 /F
