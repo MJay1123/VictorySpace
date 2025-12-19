@@ -2,7 +2,7 @@
   <div class="profile-view">
     <div class="profile-container">
       <h2 class="page-title">내 정보</h2>
-      
+
       <div class="user-info-card">
         <div class="info-content">
           <div class="info-item">
@@ -34,12 +34,8 @@
         <div v-if="isLoadingCreated" class="loading">로딩 중...</div>
         <div v-else-if="createdMatchups.length === 0" class="empty-message">만든 매치업이 없습니다.</div>
         <div v-else class="matchup-list">
-          <div 
-            v-for="matchup in createdMatchups" 
-            :key="matchup.id" 
-            class="matchup-item"
-            @click="showMatchupDetail(matchup)"
-          >
+          <div v-for="matchup in createdMatchups" :key="matchup.id" class="matchup-item"
+            @click="showMatchupDetail(matchup)">
             <h4 class="matchup-title">{{ matchup.title }}</h4>
             <p class="matchup-preview">{{ truncateContent(matchup.content) }}</p>
             <span class="matchup-date">{{ formatDate(matchup.createdAt) }}</span>
@@ -53,12 +49,8 @@
         <div v-if="isLoadingChallenged" class="loading">로딩 중...</div>
         <div v-else-if="challengedMatchups.length === 0" class="empty-message">참여한 매치업이 없습니다.</div>
         <div v-else class="matchup-list">
-          <div 
-            v-for="matchup in challengedMatchups" 
-            :key="matchup.id" 
-            class="matchup-item"
-            @click="showMatchupDetail(matchup)"
-          >
+          <div v-for="matchup in challengedMatchups" :key="matchup.id" class="matchup-item"
+            @click="showMatchupDetail(matchup)">
             <h4 class="matchup-title">{{ matchup.title }}</h4>
             <p class="matchup-preview">{{ truncateContent(matchup.content) }}</p>
             <span class="matchup-date">{{ formatDate(matchup.createdAt) }}</span>
@@ -86,6 +78,8 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import memberApi from '../api/memberApi'
+import voteApi from '../api/voteApi'
 
 const userInfo = ref({
   email: '',
@@ -118,17 +112,14 @@ const fetchCreatedMatchups = async () => {
 
   isLoadingCreated.value = true
   try {
-    const response = await fetch(`http://localhost:8080/api/vote/member/${userInfo.value.id}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    })
+    const response = await voteApi.findByMemberId(userInfo.value.id)
 
-    if (response.ok) {
-      const data = await response.json()
-      createdMatchups.value = Array.isArray(data) 
-        ? data.filter(vote => !vote.deletedAt && vote.deletedAt === null)
+    // ✅ axios는 status로 성공 판단
+    if (response.status === 200) {
+      const data = response.data
+
+      createdMatchups.value = Array.isArray(data)
+        ? data.filter(vote => vote.deletedAt === null)
         : []
     } else {
       console.error('내가 만든 매치업 조회 실패')
@@ -145,17 +136,12 @@ const fetchChallengedMatchups = async () => {
 
   isLoadingChallenged.value = true
   try {
-    const response = await fetch(`http://localhost:8080/api/vote/challenger/${userInfo.value.id}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    })
+    const response = await voteApi.findByChallengerId(userInfo.value.id)
 
-    if (response.ok) {
-      const data = await response.json()
-      challengedMatchups.value = Array.isArray(data) 
-        ? data.filter(vote => !vote.deletedAt && vote.deletedAt === null)
+    if (response.status === 200) {
+      const data = response.data
+      challengedMatchups.value = Array.isArray(data)
+        ? data.filter(vote => vote.deletedAt === null)
         : []
     } else {
       console.error('내가 참여한 매치업 조회 실패')
@@ -182,16 +168,29 @@ const truncateContent = (content) => {
   return content.length > 100 ? content.substring(0, 100) + '...' : content
 }
 
-onMounted(() => {
-  // localStorage에서 사용자 정보 불러오기
+onMounted(async () => {
   const savedUserInfo = localStorage.getItem('userInfo')
-  if (savedUserInfo) {
-    userInfo.value = JSON.parse(savedUserInfo)
-    // 매치업 목록 조회
+
+  if (!savedUserInfo) return
+
+  // ✅ 문자열 → 객체 변환
+  const parsedUser = JSON.parse(savedUserInfo)
+
+  try {
+    // ✅ 비동기 처리
+    const memberRes = await memberApi.findById(parsedUser.id)
+
+    // ✅ 사용자 전체 정보 세팅
+    userInfo.value = memberRes.data
+
+    // ✅ userInfo.id 세팅 후에 매치업 조회
     fetchCreatedMatchups()
     fetchChallengedMatchups()
+  } catch (error) {
+    console.error('회원 정보 조회 실패:', error)
   }
 })
+
 </script>
 
 <style scoped>
@@ -267,7 +266,8 @@ onMounted(() => {
   border-bottom: 2px solid #e0e0e0;
 }
 
-.loading, .empty-message {
+.loading,
+.empty-message {
   text-align: center;
   padding: 2rem;
   color: #666;
@@ -393,6 +393,7 @@ onMounted(() => {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -403,10 +404,10 @@ onMounted(() => {
     transform: translateY(20px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
   }
 }
 </style>
-
