@@ -1,5 +1,5 @@
 SET FOREIGN_KEY_CHECKS = 0;
-DROP TABLE category;
+DROP TABLE if exists category;
 SET FOREIGN_KEY_CHECKS = 1;
 
 CREATE TABLE category (

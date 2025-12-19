@@ -1,5 +1,5 @@
 SET FOREIGN_KEY_CHECKS = 0;
-DROP TABLE `likes`;
+DROP TABLE if exists `likes`;
 SET FOREIGN_KEY_CHECKS = 1;
 
 CREATE TABLE `likes` (

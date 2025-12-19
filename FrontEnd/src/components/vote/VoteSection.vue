@@ -32,6 +32,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import VoteCompetition from './VoteCompetition.vue'
 import VoteActionMenu from './VoteActionMenu.vue'
 import UpdateVoteModal from './UpdateVoteModal.vue'
@@ -43,6 +44,7 @@ import voterApi from '../../api/voterApi'
 import memberApi from '@/api/memberApi'
 import categoryApi from '@/api/categoryApi'
 
+const router = useRouter()
 const props = defineProps({
     voteId: Number
 })
@@ -127,6 +129,7 @@ const challengeVote = async (content) => {
 
 const handleDeleted = () => {
     alert('투표가 삭제되었습니다')
+    router.push('/main/votes')
 }
 
 onMounted(refresh)

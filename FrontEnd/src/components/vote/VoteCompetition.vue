@@ -59,14 +59,14 @@
         </div>
 
         <button class="detail-btn" @click="$emit('detail')">
-            결과 자세히 보기
+            📊 결과 자세히 보기
         </button>
     </div>
 </template>
 
 <script setup>
 
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick, onMounted } from 'vue'
 
 const props = defineProps({
     vote: Object,
@@ -88,10 +88,23 @@ const total = computed(() =>
     props.counts.home + props.counts.away + props.counts.neutral
 )
 
+
 const homeRate = computed(() => total.value ? props.counts.home / total.value * 100 : 0)
 const awayRate = computed(() => total.value ? props.counts.away / total.value * 100 : 0)
 const neutralRate = computed(() => total.value ? props.counts.neutral / total.value * 100 : 0)
 
+onMounted(async () => {
+    enrichedVoters.value = await Promise.all(
+        props.voters.map(async v => {
+            const res = await memberApi.findById(v.memberId)
+            return {
+                ...v,
+                gender: res.data.gender,
+                birth: res.data.birthDate
+            }
+        })
+    )
+})
 
 </script>
 
@@ -188,13 +201,13 @@ input[type="radio"] {
 }
 
 .bar {
-    height: 32px;
-    margin: 8px 0;
-    color: white;
-    font-weight: bold;
-    padding-left: 12px;
-    display: flex;
-    align-items: center;
+    color: #fff;
+    padding: 6px 10px;
+    margin-bottom: 6px;
+    border-radius: 6px;
+    font-weight: 600;
+    width: 0;
+    transition: width 0.5s ease-out;
 }
 
 .bar.home {
@@ -210,7 +223,21 @@ input[type="radio"] {
 }
 
 .detail-btn {
-    width: 100%;
-    margin-top: 16px;
+    margin-top: 12px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    border: 1.5px solid #6366f1;
+    background: linear-gradient(to right, #eef2ff, #ffffff);
+    color: #4338ca;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.detail-btn:hover {
+    background: linear-gradient(to right, #6366f1, #4f46e5);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35);
 }
 </style>

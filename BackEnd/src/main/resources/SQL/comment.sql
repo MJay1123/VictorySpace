@@ -1,5 +1,5 @@
 SET FOREIGN_KEY_CHECKS = 0;
-DROP TABLE comment;
+DROP TABLE if exists comment;
 SET FOREIGN_KEY_CHECKS = 1;
 
 CREATE TABLE comment (

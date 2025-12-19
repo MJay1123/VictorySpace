@@ -1,5 +1,5 @@
 SET FOREIGN_KEY_CHECKS = 0;
-DROP TABLE grade;
+DROP TABLE if exists grade;
 SET FOREIGN_KEY_CHECKS = 1;
 
 CREATE TABLE grade (

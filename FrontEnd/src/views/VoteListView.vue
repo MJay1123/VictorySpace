@@ -61,7 +61,7 @@ const formatDate = (dateString) => {
 const fetchVotes = async () => {
   try {
     const res = await voteApi.findAll();
-    const voteList = res.data;
+    const voteList = res.data.filter(vote => vote.deletedAt === null);
 
     // 🔥 memberId 기반 닉네임 조회
     for (const vote of voteList) {
