@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
     <div class="modal-overlay">
         <div class="modal-card">
 
@@ -799,4 +799,4 @@ input[type="radio"] {
     font-style: italic;
     user-select: none;
 }
-</style>
+</style> -->
