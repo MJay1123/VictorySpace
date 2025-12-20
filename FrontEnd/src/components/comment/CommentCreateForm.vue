@@ -14,6 +14,15 @@
   import { ref } from 'vue'
   import commentApi from '@/api/commentApi'
   
+  const user = computed(() => {
+    try {
+        return JSON.parse(localStorage.getItem('userInfo'))
+    } catch {
+        console.log("유저 정보 로딩 실패")
+        return null
+    }
+})
+
   const props = defineProps({
     voteId: Number,
   })
@@ -26,8 +35,9 @@
     if (!content.value.trim()) return
   
     try {
-      await commentApi.create({
+      await commentApi.createComment({
         voteId: props.voteId,
+        memberId: user.id,
         content: content.value,
       })
   
