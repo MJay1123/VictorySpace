@@ -1,25 +1,33 @@
 <template>
     <div class="comment-item">
-        <CommentActionMenu v-if="canEdit" @edit="showUpdate = true" @delete="showDelete = true" />
-
         <UpdateCommentModal v-if="showUpdate" :comment="comment" @close="showUpdate = false" @updated="handleUpdate" />
 
         <DeleteCommentModal v-if="showDelete" :commentId="comment.id" @close="showDelete = false"
             @deleted="handleDelete" />
-        <div class="meta">
-            <b>{{ comment.nickname ?? '익명' }}</b>
-            <span class="date">{{ formatDate(comment.createdAt) }}</span>
+
+        <div class="comment-header">
+            <div class="meta">
+                <b class="nickname">{{ commentNickname ?? '익명' }}</b>
+                <span class="date">
+                    {{ comment.updatedAt !== comment.createdAt
+                        ? formatDate(comment.updatedAt) + ' · 수정됨'
+                        : formatDate(comment.createdAt)
+                    }}
+                </span>
+            </div>
+            <CommentActionMenu v-if="canEdit" @edit="showUpdate = true" @delete="showDelete = true" />
         </div>
         <p class="content">{{ comment.content }}</p>
     </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import CommentActionMenu from './CommentActionMenu.vue'
 import UpdateCommentModal from './UpdateCommentModal.vue'
 import DeleteCommentModal from './DeleteCommentModal.vue'
 import commentApi from '../../api/commentApi'
+import memberApi from '../../api/memberApi'
 
 const props = defineProps({
     comment: {
@@ -27,6 +35,16 @@ const props = defineProps({
         required: true
     },
 })
+
+const commentNickname = ref('')
+const fetchNickname = async () => {
+    try {
+        const res = await memberApi.findById(props.comment.memberId)
+        commentNickname.value = res.data.nickname
+    } catch (e) {
+        console.error('닉네임 조회 실패', e)
+    }
+}
 
 const emit = defineEmits(["updated", "deleted"])
 
@@ -55,7 +73,7 @@ const showDelete = ref(false)
 const handleUpdate = async ({ id, content }) => {
     try {
         const updatedDto = {
-            content,      
+            content,
         }
 
         await commentApi.updateComment(id, updatedDto)
@@ -81,30 +99,56 @@ const handleDelete = async () => {
     }
 }
 
+onMounted(fetchNickname)
+
 </script>
 
 <style scoped>
 .comment-item {
     position: relative;
-    padding: 12px 0;
-    border-bottom: 1px solid #eee;
+    padding: 20px;
+    border-bottom: 1px solid #e5e7eb;
+    transition: background-color 0.2s ease;
 }
 
-.action-menu {
-    position: absolute;
-    top: 8px;
-    right: 0;
+.comment-item:hover {
+    background-color: #f9fafb;
+}
+
+.comment-item:last-child {
+    border-bottom: none;
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
 }
 
 .meta {
-    font-size: 13px;
-    color: #555;
     display: flex;
-    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.nickname {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.date {
+    font-size: 13px;
+    color: #6b7280;
 }
 
 .content {
-    margin-top: 6px;
-    font-size: 14px;
+    margin-top: 0;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #374151;
+    word-break: break-word;
 }
 </style>
