@@ -83,43 +83,92 @@ watch(() => props.voteId, fetchComments)
 <style scoped>
 .comment-section {
     margin-top: 32px;
-    padding-top: 24px;
-    border-top: 1px solid #e5e7eb;
+    padding: 32px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.section-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    color: #1f2937;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .comment-form {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    margin-bottom: 20px;
+    gap: 12px;
+    margin-bottom: 32px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
 }
 
 textarea {
     resize: none;
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px solid #d1d5db;
+    padding: 14px 16px;
+    border-radius: 10px;
+    border: 2px solid #e5e7eb;
+    font-size: 15px;
+    font-family: inherit;
+    transition: all 0.3s ease;
+    background: white;
+    color: #1f2937;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+textarea::placeholder {
+    color: #9ca3af;
 }
 
 button {
     align-self: flex-end;
-    background: #2563eb;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    padding: 6px 14px;
-    border-radius: 6px;
+    padding: 10px 24px;
+    border-radius: 10px;
     border: none;
     cursor: pointer;
+    font-weight: 600;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
-.section-title {
-    font-size: 20px;
-    font-weight: bold;
-    margin-bottom: 16px;
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+.comment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
 }
 
 .empty {
-    color: #777;
-    font-size: 14px;
-    margin-top: 10px;
+    color: #9ca3af;
+    font-size: 15px;
+    margin-top: 20px;
+    text-align: center;
+    padding: 40px;
+    background: #f9fafb;
+    border-radius: 12px;
 }
 </style>
