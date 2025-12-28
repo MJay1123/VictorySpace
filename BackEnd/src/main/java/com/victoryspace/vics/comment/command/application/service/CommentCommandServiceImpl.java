@@ -23,7 +23,6 @@ public class CommentCommandServiceImpl implements CommentCommandService {
         entity.setMemberId(dto.getMemberId());
         entity.setContent(dto.getContent());
         entity.setCreatedAt(LocalDateTime.now());
-        entity.setUpdatedAt(LocalDateTime.now());
         CommentEntity createdEntity = repository.save(entity);
         return mapper.toDto(createdEntity);
     }
