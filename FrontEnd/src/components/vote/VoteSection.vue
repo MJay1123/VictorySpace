@@ -49,13 +49,21 @@
                     <div class="side-content">
                         <p>{{ vote.challengerContent || '도전자가 없습니다.' }}</p>
                     </div>
-                    <label v-if="vote.challengerId" class="select-label">
-                        <input type="radio" value="away" v-model="selectedOption" :disabled="Boolean(userVote)" />
-                        <span>선택</span>
-                    </label>
-                    <button v-else class="challenge-btn" @click="challengeVote(selectedOption || 'away')">
-                        도전하기
-                    </button>
+                    <!-- 도전자가 이미 있을 때 -->
+                    <div v-if="vote.challengerId">
+                        <label class="select-label">
+                            <input type="radio" value="away" v-model="selectedOption" :disabled="Boolean(userVote)" />
+                            <span>선택</span>
+                        </label>
+                    </div>
+
+                    <!-- 도전자가 없을 때 -->
+                    <div v-else>
+                        <input v-model="challengerContent" placeholder="도전자 내용을 입력하세요" />
+                        <button class="challenge-btn" @click="challengeVote">
+                            도전하기
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -121,6 +129,7 @@ const challengerNickname = ref('')
 const voters = ref([])
 const userVote = ref(null)
 const selectedOption = ref(null)
+const challengerContent = ref('')
 
 const counts = ref({ home: 0, away: 0, neutral: 0 })
 
@@ -195,11 +204,18 @@ const cancelVote = async () => {
     refresh()
 }
 
-const challengeVote = async content => {
+const challengeVote = async () => {
+    if (!challengerContent.value.trim()) {
+        alert('도전자 내용을 입력해주세요')
+        return
+    }
+
     await voteApi.challengeVote(vote.value.id, {
         challengerId: user.value.id,
-        challengerContent: content
+        challengerContent: challengerContent.value
     })
+
+    challengerContent.value = ''
     refresh()
 }
 
