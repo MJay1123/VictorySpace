@@ -1,20 +1,24 @@
 <template>
     <section>
         <h3>전체 득표</h3>
-        <div class="bar-group">
-            <div v-for="type in ['home', 'away', 'neutral']" :key="type" class="bar" :class="type"
-                :style="{ width: rate(type) + '%' }">
-                <span class="bar-label text-outline">
-                    {{ type.toUpperCase() }} {{ stats[type] }}
-                </span>
-            </div>
-        </div>
 
-        <div class="selector">
-            <button v-for="type in ['total', 'home', 'away', 'neutral']" :key="type"
-                :class="{ active: selectedType === type }" @click="$emit('update:selectedType', type)">
-                {{ type.toUpperCase() }}
-            </button>
+        <div class="grid">
+            <template v-for="type in ['home', 'away', 'neutral']" :key="type">
+                <!-- 1열 -->
+                <div class="label-box">
+                    {{ type.toUpperCase() }}
+                </div>
+
+                <!-- 2열 -->
+                <div class="bar-track">
+                    <div class="bar" :class="type" :style="{ width: rate(type) + '%' }" />
+                </div>
+
+                <!-- 3열 -->
+                <div class="value-box">
+                    {{ stats[type] }}명 {{ rate(type) }}%
+                </div>
+            </template>
         </div>
     </section>
 </template>
@@ -44,21 +48,43 @@ const rate = type =>
 </script>
 
 <style scoped>
+section {
+    background: #ffffff;
+    padding: 16px;
+    border-radius: 12px;
+}
 
-.bar-group {
-    margin-top: 10px;
+.grid {
+    display: grid;
+    grid-template-columns: 90px 1fr 120px;
+    row-gap: 12px;
+    align-items: center;
+}
+
+.label-box {
+    width: 90px;
+    height: 50px;
+    background: #727272a1;
+    color: #000000;
+    font-weight: 700;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+}
+
+.bar-track {
+    height: 44px;
+    background: #ffffff;
+    border-radius: 6px;
+    overflow: hidden;
 }
 
 .bar {
-    min-width: 90px;
-    /* 🔥 최소 길이 보장 */
-    height: 50px;
-    display: flex;
-    align-items: center;
-    padding-left: 10px;
-    border-radius: 6px;
-    transition: width 0.8s ease;
-    box-sizing: border-box;
+    height: 100%;
+    border-radius: 5px;
+    transition: width 1s ease;
 }
 
 .bar.home {
@@ -73,35 +99,38 @@ const rate = type =>
     background: #22c55e;
 }
 
+.value-box {
+    color: #000000;
+    font-size: 18px;
+    font-weight: 700;
+    opacity: 0;
+    animation: fadeIn 1s ease forwards;
+    animation-delay: 1s;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
 .bar-label {
+    display: flex;
+    align-items: center;
+    gap: 30px;
     white-space: nowrap;
     font-weight: 700;
-    font-size: 14px;
+    font-size: 20px;
     color: #fff;
 }
 
-.selector {
-    display: flex;
-    gap: 10px;
-    margin-top: 12px;
+.label-count {
+    font-size: 20px;
 }
 
-.selector button {
-    flex: 1;
-    padding: 12px 0;
-    font-size: 15px;
-    font-weight: 700;
-    border-radius: 8px;
-    border: 1px solid #d1d5db;
-    background: #f9fafb;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.selector button.active {
-    background: #6366f1;
-    color: white;
-    border-color: #6366f1;
+.label-rate {
+    font-size: 20px;
+    opacity: 0.9;
 }
 
 .text-outline {
@@ -111,5 +140,4 @@ const rate = type =>
         -1px 1px 0 #666,
         1px 1px 0 #666;
 }
-
 </style>

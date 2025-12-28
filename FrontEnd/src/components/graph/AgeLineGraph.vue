@@ -159,10 +159,12 @@ const animateGraph = async () => {
     // 2️⃣ DOM 반영 기다림
     await nextTick()
 
-    // 3️⃣ 다음 프레임에서 실제 위치로
+    // 3️⃣ 다음 프레임에서 실제 위치로 (부드러운 애니메이션)
     requestAnimationFrame(() => {
-        displayPoints.value = realPointList.value
-        animated.value = true
+        setTimeout(() => {
+            displayPoints.value = realPointList.value
+            animated.value = true
+        }, 50)
     })
 }
 
@@ -182,6 +184,20 @@ const linePoints = computed(() =>
 .line-chart {
     width: 100%;
     margin-top: 12px;
+}
+
+polyline {
+    transition: points 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+circle {
+    transition: cx 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+                cy 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.6s ease;
+}
+
+g {
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 

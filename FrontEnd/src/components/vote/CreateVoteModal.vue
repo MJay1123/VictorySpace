@@ -116,11 +116,12 @@ const createVote = async () => {
 }
 
 .modal-card {
-    width: 520px;
+    width: 680px;
+    max-width: 90vw;
     background: white;
-    padding: 2rem;
-    border-radius: 15px;
-    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+    padding: 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     position: relative;
     animation: fadeIn 0.25s ease-out;
 }
@@ -138,10 +139,13 @@ const createVote = async () => {
 
 .modal-title {
     text-align: center;
-    font-size: 1.75rem;
-    font-weight: 600;
-    margin-bottom: 1.2rem;
-    color: #333;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .form {
@@ -160,10 +164,10 @@ input,
 textarea,
 select {
     width: 100%;
-    padding: 10px 12px;
-    border-radius: 10px;
+    padding: 14px 16px;
+    border-radius: 12px;
     border: 2px solid #e0e0e0;
-    font-size: 1rem;
+    font-size: 1.05rem;
     transition: all 0.25s;
 }
 
@@ -176,7 +180,8 @@ select:focus {
 }
 
 textarea {
-    min-height: 90px;
+    min-height: 120px;
+    resize: vertical;
 }
 
 .duration {
@@ -190,16 +195,17 @@ textarea {
 }
 
 .action-btn {
-    margin-top: 10px;
-    padding: 14px;
-    font-size: 1.05rem;
-    font-weight: 600;
+    margin-top: 12px;
+    padding: 16px;
+    font-size: 1.1rem;
+    font-weight: 700;
     color: white;
     background: linear-gradient(135deg, #667eea, #764ba2);
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
     cursor: pointer;
-    transition: 0.25s;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 .action-btn:hover {

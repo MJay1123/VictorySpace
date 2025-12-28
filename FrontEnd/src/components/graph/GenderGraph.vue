@@ -97,7 +97,17 @@ const femaleDash = computed(() =>
 }
 
 circle {
-    transition: stroke-dasharray 0.8s ease, stroke-dashoffset 0.8s ease;
+    transition: stroke-dasharray 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
+                stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: center;
+}
+
+.pie-wrapper {
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pie-wrapper:hover {
+    transform: scale(1.05);
 }
 
 .center-label {

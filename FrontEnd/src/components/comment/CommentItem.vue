@@ -1,21 +1,22 @@
 <template>
     <div class="comment-item">
-        <UpdateCommentModal v-if="showUpdate" :comment="comment" @close="showUpdate = false" @updated="handleUpdate" />
+        <UpdateCommentModal v-if="showUpdateModal" :comment="comment" @close="showUpdateModal = false"
+            @updated="handleUpdate" />
 
-        <DeleteCommentModal v-if="showDelete" :commentId="comment.id" @close="showDelete = false"
+        <DeleteCommentModal v-if="showDeleteModal" :commentId="comment.id" @close="showDeleteModal = false"
             @deleted="handleDelete" />
 
         <div class="comment-header">
             <div class="meta">
                 <b class="nickname">{{ commentNickname ?? '익명' }}</b>
                 <span class="date">
-                    {{ comment.updatedAt !== comment.createdAt
+                    {{ comment.updatedAt
                         ? formatDate(comment.updatedAt) + ' · 수정됨'
                         : formatDate(comment.createdAt)
                     }}
                 </span>
             </div>
-            <CommentActionMenu v-if="canEdit" @edit="showUpdate = true" @delete="showDelete = true" />
+            <CommentActionMenu v-if="canEdit" @edit="showUpdateModal = true" @delete="showDeleteModal = true" />
         </div>
         <p class="content">{{ comment.content }}</p>
     </div>
@@ -58,7 +59,7 @@ const user = computed(() => {
 })
 
 const canEdit = computed(() =>
-    user.value && props.comment.memberId === user.value.id
+    user.value && user.value.id === props.comment.memberId
 )
 
 const formatDate = (dateString) => {
@@ -67,8 +68,8 @@ const formatDate = (dateString) => {
     return `${d.getMonth() + 1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`
 }
 
-const showUpdate = ref(false)
-const showDelete = ref(false)
+const showUpdateModal = ref(false)
+const showDeleteModal = ref(false)
 
 const handleUpdate = async ({ id, content }) => {
     try {
@@ -80,7 +81,7 @@ const handleUpdate = async ({ id, content }) => {
 
         props.comment.content = content
         emit('updated')
-        showUpdate.value = false
+        showUpdateModal.value = false
     } catch (err) {
         console.error(err)
         alert('댓글 수정 중 오류가 발생했습니다.')
@@ -92,7 +93,7 @@ const handleDelete = async () => {
     try {
         await commentApi.deleteComment(props.comment.id)
         emit('deleted')
-        showDelete.value = false
+        showDeleteModal.value = false
     } catch (err) {
         console.error(err)
         alert('댓글 삭제 중 오류가 발생했습니다.')

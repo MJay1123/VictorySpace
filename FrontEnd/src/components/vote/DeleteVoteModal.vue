@@ -24,7 +24,10 @@
 import voteApi from '@/api/voteApi'
 
 const props = defineProps({
-    voteId: Number
+    voteId: {
+        type: Number,
+        required: true
+    }
 })
 
 const emit = defineEmits(['close', 'deleted'])
