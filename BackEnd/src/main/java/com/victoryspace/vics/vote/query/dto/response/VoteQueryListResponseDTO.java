@@ -1,16 +1,11 @@
 package com.victoryspace.vics.vote.query.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Builder
 public class VoteQueryListResponseDTO {
     private Integer id;
     private String title;

@@ -1,18 +1,13 @@
 package com.victoryspace.vics.vote.command.domain.aggregate;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "vote")
 public class VoteEntity {
     @Id
@@ -52,4 +47,46 @@ public class VoteEntity {
 
     @Column(name = "ended_at")
     private LocalDateTime endedAt;
+
+    public static VoteEntity create(String title, Integer categoryId, String content, Integer memberId, String duration) {
+        VoteEntity vote = new VoteEntity();
+        vote.title = title;
+        vote.categoryId = categoryId;
+        vote.content = content;
+        vote.memberId = memberId;
+        vote.duration = duration;
+        vote.createdAt = LocalDateTime.now();
+        return vote;
+    }
+
+    public void update(String title, Integer categoryId, String content, String duration) {
+        this.title = title;
+        this.categoryId = categoryId;
+        this.content = content;
+        this.duration = duration;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void delete() {
+        this.deletedAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void challenge(Integer challengerId, String challengerContent) {
+        this.challengerId = challengerId;
+        this.challengerContent = challengerContent;
+        this.endedAt = calculateEndedAt();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    private LocalDateTime calculateEndedAt() {
+        LocalDateTime now = LocalDateTime.now();
+        if (duration.endsWith("h")) {
+            return now.plusHours(Integer.parseInt(duration.replace("h", "")));
+        }
+        if (duration.endsWith("d")) {
+            return now.plusDays(Integer.parseInt(duration.replace("d", "")));
+        }
+        throw new IllegalArgumentException("Invalid duration format: " + duration);
+    }
 }

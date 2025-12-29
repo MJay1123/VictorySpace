@@ -30,18 +30,24 @@ public class VoteQueryServiceImpl implements VoteQueryService {
             throw new VoteException(ErrorCode.VOTE_NOT_FOUND);
         }
 
-        VoteQueryCountDTO countDTO = mapper.findVoteCounts(id);
-        if(countDTO == null) {
-            detailDTO.setHomeCount(0);
-            detailDTO.setAwayCount(0);
-            detailDTO.setNeutralCount(0);
-        } else {
-            detailDTO.setHomeCount(countDTO.getHomeCount());
-            detailDTO.setAwayCount(countDTO.getAwayCount());
-            detailDTO.setNeutralCount(countDTO.getNeutralCount());
-        }
+//        VoteQueryCountDTO countDTO = mapper.findVoteCounts(id);
 
-        return detailDTO;
+        return VoteQueryDetailResponseDTO.builder()
+                .id(detailDTO.getId())
+                .title(detailDTO.getTitle())
+                .categoryName(detailDTO.getCategoryName())
+                .memberNickname(detailDTO.getMemberNickname())
+                .content(detailDTO.getContent())
+                .challengerNickname(detailDTO.getChallengerNickname())
+                .challengerContent(detailDTO.getChallengerContent())
+                .createdAt(detailDTO.getCreatedAt())
+                .updatedAt(detailDTO.getUpdatedAt())
+                .duration(detailDTO.getDuration())
+                .endedAt(detailDTO.getEndedAt())
+                .homeCount(detailDTO.getHomeCount())
+                .awayCount(detailDTO.getAwayCount())
+                .neutralCount(detailDTO.getNeutralCount())
+                .build();
     }
 
     @Override

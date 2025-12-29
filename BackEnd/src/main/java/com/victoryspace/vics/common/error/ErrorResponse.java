@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 public class ErrorResponse {
 
     private boolean success;
+    private String name;
     private String code;
     private String message;
     private LocalDateTime timestamp;
@@ -18,6 +19,7 @@ public class ErrorResponse {
         return new ErrorResponse(
                 false,
                 errorCode.name(),
+                errorCode.getCode(),
                 errorCode.getMessage(),
                 LocalDateTime.now()
         );

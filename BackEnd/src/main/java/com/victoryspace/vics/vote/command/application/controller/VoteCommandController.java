@@ -1,6 +1,13 @@
 package com.victoryspace.vics.vote.command.application.controller;
 
 import com.victoryspace.vics.vote.command.application.dto.VoteCommandDTO;
+import com.victoryspace.vics.vote.command.application.dto.request.VoteChallengeRequestDTO;
+import com.victoryspace.vics.vote.command.application.dto.request.VoteCreateRequestDTO;
+import com.victoryspace.vics.vote.command.application.dto.request.VoteUpdateRequestDTO;
+import com.victoryspace.vics.vote.command.application.dto.response.VoteChallengeResponseDTO;
+import com.victoryspace.vics.vote.command.application.dto.response.VoteCreateResponseDTO;
+import com.victoryspace.vics.vote.command.application.dto.response.VoteDeleteResponseDTO;
+import com.victoryspace.vics.vote.command.application.dto.response.VoteUpdateResponseDTO;
 import com.victoryspace.vics.vote.command.application.service.VoteCommandService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -16,26 +23,22 @@ public class VoteCommandController {
     }
 
     @PostMapping
-    public VoteCommandDTO createVote(@RequestBody VoteCommandDTO voteCommandDTO) {
-        VoteCommandDTO createdVoteDTO = voteCommandService.createVote(voteCommandDTO);
-        return createdVoteDTO;
+    public VoteCreateResponseDTO createVote(@RequestBody VoteCreateRequestDTO requestDTO) {
+        return voteCommandService.createVote(requestDTO);
     }
 
     @PatchMapping("/{id}")
-    public VoteCommandDTO updateVote(@PathVariable Integer id, @RequestBody VoteCommandDTO voteCommandDTO) {
-        VoteCommandDTO updatedVoteDTO = voteCommandService.updateVote(id, voteCommandDTO);
-        return updatedVoteDTO;
-    }
-
-    @PatchMapping("/challenge/{voteId}")
-    public VoteCommandDTO challegeVote(@PathVariable Integer voteId, @RequestBody VoteCommandDTO voteCommandDTO) {
-        VoteCommandDTO updatedVoteCommandDTO = voteCommandService.challengeVote(voteId, voteCommandDTO);
-        return updatedVoteCommandDTO;
+    public VoteUpdateResponseDTO updateVote(@PathVariable Integer id, @RequestBody VoteUpdateRequestDTO requestDTO) {
+        return voteCommandService.updateVote(id, requestDTO);
     }
 
     @DeleteMapping("/{id}")
-    public VoteCommandDTO deleteVote(@PathVariable Integer id) {
-        VoteCommandDTO deletedVoteDTO = voteCommandService.deleteVote(id);
-        return deletedVoteDTO;
+    public VoteDeleteResponseDTO deleteVote(@PathVariable Integer id) {
+        return voteCommandService.deleteVote(id);
+    }
+
+    @PatchMapping("/challenge/{voteId}")
+    public VoteChallengeResponseDTO challengeVote(@PathVariable Integer voteId, @RequestBody VoteChallengeRequestDTO requestDTO) {
+        return voteCommandService.challengeVote(voteId, requestDTO);
     }
 }

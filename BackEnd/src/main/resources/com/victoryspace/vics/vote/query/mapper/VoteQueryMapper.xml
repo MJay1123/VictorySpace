@@ -45,6 +45,9 @@
         <result property="updatedAt" column="updated_at"/>
         <result property="duration" column="duration"/>
         <result property="endedAt" column="ended_at"/>
+        <result property="homeCount" column="home_count"/>
+        <result property="awayCount" column="away_count"/>
+        <result property="neutralCount" column="neutral_count"/>
     </resultMap>
 
     <select id="findAll" resultMap="VoteListResponse">
@@ -59,6 +62,7 @@
         FROM vote v
         JOIN category c ON c.id = v.category_id
         JOIN member m ON m.id = v.member_id
+        WHERE v.deleted_at IS NULL
         ORDER BY v.created_at DESC
     </select>
 
@@ -74,24 +78,31 @@
             v.created_at,
             v.updated_at,
             v.duration,
-            v.ended_at
+            v.ended_at,
+            COALESCE(SUM(CASE WHEN vt.content = 'home' THEN 1 ELSE 0 END), 0) AS home_count,
+            COALESCE(SUM(CASE WHEN vt.content = 'away' THEN 1 ELSE 0 END), 0) AS away_count,
+            COALESCE(SUM(CASE WHEN vt.content = 'neutral' THEN 1 ELSE 0 END), 0) AS neutral_count
         FROM vote v
         JOIN category c ON v.category_id = c.id
-        JOIN member m ON m.id = v.member_id = m.id
+        JOIN member m ON m.id = v.member_id
         LEFT JOIN member ch ON ch.id = v.challenger_id
+        LEFT JOIN voter vt ON v.id = vt.vote_id
         WHERE v.id = #{id}
         AND v.deleted_at IS NULL
+        GROUP BY
+            v.id
+
     </select>
 
-    <select id="findVoteCounts" resultType="com.victoryspace.vics.vote.query.dto.response.VoteQueryCountDTO">
-        SELECT
-            SUM(CASE WHEN vt.content = 'home' THEN 1 ELSE 0 END) AS homeCount,
-            SUM(CASE WHEN vt.content = 'away' THEN 1 ELSE 0 END) AS awayCount,
-            SUM(CASE WHEN vt.content = 'neutral' THEN 1 ELSE 0 END) AS neutralCount
-        FROM vote v
-        JOIN voter vt ON v.id = vt.vote_id
-        WHERE v.id = #{id}
-    </select>
+<!--    <select id="findVoteCounts" resultType="com.victoryspace.vics.vote.query.dto.response.VoteQueryCountDTO">-->
+<!--        SELECT-->
+<!--            COALESCE(SUM(CASE WHEN vt.content = 'home' THEN 1 ELSE 0 END), 0) AS homeCount,-->
+<!--            COALESCE(SUM(CASE WHEN vt.content = 'away' THEN 1 ELSE 0 END), 0) AS awayCount,-->
+<!--            COALESCE(SUM(CASE WHEN vt.content = 'neutral' THEN 1 ELSE 0 END), 0) AS neutralCount-->
+<!--        FROM vote v-->
+<!--        JOIN voter vt ON v.id = vt.vote_id-->
+<!--        WHERE v.id = #{id}-->
+<!--    </select>-->
 
     <select id="findByMemberId" resultMap="VoteListResponse">
         SELECT
@@ -107,6 +118,7 @@
         JOIN category c ON c.id = v.category_id
         JOIN member m ON m.id = v.member_id
         WHERE v.member_id = #{memberId}
+        AND v.deleted_at IS NULL
         ORDER BY v.created_at DESC
     </select>
 
@@ -124,6 +136,7 @@
         JOIN category c ON c.id = v.category_id
         JOIN member m ON m.id = v.member_id
         WHERE v.challenger_id = #{challengerId}
+          AND v.deleted_at IS NULL
         ORDER BY v.created_at DESC
     </select>
 

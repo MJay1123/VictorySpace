@@ -1,13 +1,20 @@
 package com.victoryspace.vics.vote.command.application.service;
 
 import com.victoryspace.vics.vote.command.application.dto.VoteCommandDTO;
+import com.victoryspace.vics.vote.command.application.dto.request.VoteChallengeRequestDTO;
+import com.victoryspace.vics.vote.command.application.dto.request.VoteCreateRequestDTO;
+import com.victoryspace.vics.vote.command.application.dto.request.VoteUpdateRequestDTO;
+import com.victoryspace.vics.vote.command.application.dto.response.VoteChallengeResponseDTO;
+import com.victoryspace.vics.vote.command.application.dto.response.VoteCreateResponseDTO;
+import com.victoryspace.vics.vote.command.application.dto.response.VoteDeleteResponseDTO;
+import com.victoryspace.vics.vote.command.application.dto.response.VoteUpdateResponseDTO;
 
 public interface VoteCommandService {
-    VoteCommandDTO createVote(VoteCommandDTO voteCommandDTO);
+    VoteCreateResponseDTO createVote(VoteCreateRequestDTO requestDTO);
 
-    VoteCommandDTO updateVote(Integer id, VoteCommandDTO voteCommandDTO);
+    VoteUpdateResponseDTO updateVote(Integer id, VoteUpdateRequestDTO requestDTO);
 
-    VoteCommandDTO deleteVote(Integer id);
+    VoteDeleteResponseDTO deleteVote(Integer id);
 
-    VoteCommandDTO challengeVote(Integer voteId, VoteCommandDTO voteCommandDTO);
+    VoteChallengeResponseDTO challengeVote(Integer voteId, VoteChallengeRequestDTO requestDTO);
 }

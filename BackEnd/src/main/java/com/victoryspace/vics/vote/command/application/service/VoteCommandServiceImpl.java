@@ -1,14 +1,20 @@
 package com.victoryspace.vics.vote.command.application.service;
 
-import com.victoryspace.vics.vote.command.application.dto.VoteCommandDTO;
+import com.victoryspace.vics.common.error.ErrorCode;
+import com.victoryspace.vics.vote.command.application.dto.request.VoteChallengeRequestDTO;
+import com.victoryspace.vics.vote.command.application.dto.request.VoteCreateRequestDTO;
+import com.victoryspace.vics.vote.command.application.dto.request.VoteUpdateRequestDTO;
+import com.victoryspace.vics.vote.command.application.dto.response.VoteChallengeResponseDTO;
+import com.victoryspace.vics.vote.command.application.dto.response.VoteCreateResponseDTO;
+import com.victoryspace.vics.vote.command.application.dto.response.VoteDeleteResponseDTO;
+import com.victoryspace.vics.vote.command.application.dto.response.VoteUpdateResponseDTO;
 import com.victoryspace.vics.vote.command.application.mapper.VoteCommandMapper;
 import com.victoryspace.vics.vote.command.domain.aggregate.VoteEntity;
 import com.victoryspace.vics.vote.command.domain.repository.VoteRepository;
+import com.victoryspace.vics.vote.exception.VoteException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -17,72 +23,52 @@ public class VoteCommandServiceImpl implements VoteCommandService {
     private final VoteCommandMapper voteCommandMapper;
 
     @Override
-    public VoteCommandDTO createVote(VoteCommandDTO voteCommandDTO) {
-        VoteEntity voteEntity = new VoteEntity();
-        voteEntity.setTitle(voteCommandDTO.getTitle());
-        voteEntity.setCategoryId(voteCommandDTO.getCategoryId());
-        voteEntity.setContent(voteCommandDTO.getContent());
-        voteEntity.setMemberId(voteCommandDTO.getMemberId());
-        voteEntity.setCreatedAt(LocalDateTime.now());
-        voteEntity.setUpdatedAt(LocalDateTime.now());
-        voteEntity.setDuration(voteCommandDTO.getDuration());
-        VoteEntity createdVoteEntity = voteRepository.save(voteEntity);
-        return voteCommandMapper.toDto(createdVoteEntity);
+    public VoteCreateResponseDTO createVote(VoteCreateRequestDTO requestDTO) {
+        VoteEntity voteEntity = VoteEntity.create(
+                requestDTO.getTitle(),
+                requestDTO.getCategoryId(),
+                requestDTO.getContent(),
+                requestDTO.getMemberId(),
+                requestDTO.getDuration()
+        );
+        return voteCommandMapper.toCreateResponseDto(voteRepository.save(voteEntity));
     }
 
     @Override
-    public VoteCommandDTO updateVote(Integer id, VoteCommandDTO voteCommandDTO) {
+    public VoteUpdateResponseDTO updateVote(Integer id, VoteUpdateRequestDTO requestDTO) {
         VoteEntity voteEntity = voteRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Vote not found"));
-        voteEntity.setTitle(voteCommandDTO.getTitle());
-        voteEntity.setCategoryId(voteCommandDTO.getCategoryId());
-        voteEntity.setContent(voteCommandDTO.getContent());
-        voteEntity.setUpdatedAt(LocalDateTime.now());
-        voteEntity.setDuration(voteCommandDTO.getDuration());
-        VoteEntity updatedVoteEntity = voteRepository.save(voteEntity);
-        return voteCommandMapper.toDto(updatedVoteEntity);
+                .orElseThrow(() -> new VoteException(ErrorCode.VOTE_NOT_FOUND));
+        voteEntity.update(
+                requestDTO.getTitle(),
+                requestDTO.getCategoryId(),
+                requestDTO.getContent(),
+                requestDTO.getDuration()
+        );
+        return voteCommandMapper.toUpdateResponseDto(voteRepository.save(voteEntity));
     }
 
     @Override
-    public VoteCommandDTO deleteVote(Integer id) {
+    public VoteDeleteResponseDTO deleteVote(Integer id) {
         VoteEntity voteEntity = voteRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Vote not found"));
-        voteEntity.setUpdatedAt(LocalDateTime.now());
-        voteEntity.setDeletedAt(LocalDateTime.now());
-        VoteEntity deletedVoteEntity = voteRepository.save(voteEntity);
-        return voteCommandMapper.toDto(deletedVoteEntity);
+                .orElseThrow(() -> new VoteException(ErrorCode.VOTE_NOT_FOUND));
+        voteEntity.delete();
+        return voteCommandMapper.toDeleteResponseDto(voteRepository.save(voteEntity));
     }
 
     @Override
-    public VoteCommandDTO challengeVote(Integer voteId, VoteCommandDTO voteCommandDTO) {
+    public VoteChallengeResponseDTO challengeVote(Integer voteId, VoteChallengeRequestDTO requestDTO) {
         VoteEntity voteEntity = voteRepository.findById(voteId)
-                .orElseThrow(() -> new EntityNotFoundException("Vote not found"));
-        Integer challengerId = voteCommandDTO.getChallengerId();
-        if(voteEntity.getMemberId() == challengerId){
-            throw new RuntimeException("cannot challenge myself");
-        }
+                .orElseThrow(() -> new VoteException(ErrorCode.VOTE_NOT_FOUND));
         if(voteEntity.getChallengerId() != null){
-            throw new RuntimeException("already challenged");
+            throw new VoteException(ErrorCode.VOTE_ALREADY_CHALLENGED);
         }
-        String challengerContent = voteCommandDTO.getChallengerContent();
-        voteEntity.setChallengerId(challengerId);
-        voteEntity.setChallengerContent(challengerContent);
-        voteEntity.setUpdatedAt(LocalDateTime.now());
-
-        String duration = voteEntity.getDuration(); // 예: "3h", "5d"
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime endedAt;
-        if (duration.endsWith("h")) {
-            int hours = Integer.parseInt(duration.replace("h", ""));
-            endedAt = now.plusHours(hours);
-        } else if (duration.endsWith("d")) {
-            int days = Integer.parseInt(duration.replace("d", ""));
-            endedAt = now.plusDays(days);
-        } else {
-            throw new IllegalArgumentException("Invalid duration format: " + duration);
+        if(voteEntity.getMemberId() == requestDTO.getChallengerId()){
+            throw new VoteException(ErrorCode.VOTE_SELF_CHALLENGED);
         }
-        voteEntity.setEndedAt(endedAt);
-        VoteEntity updatedVoteEntity = voteRepository.save(voteEntity);
-        return voteCommandMapper.toDto(updatedVoteEntity);
+        voteEntity.challenge(
+                requestDTO.getChallengerId(),
+                requestDTO.getChallengerContent()
+        );
+        return voteCommandMapper.toChallengeResponseDto(voteRepository.save(voteEntity));
     }
 }
