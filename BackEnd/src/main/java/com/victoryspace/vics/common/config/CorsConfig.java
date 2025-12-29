@@ -1,4 +1,4 @@
-package com.victoryspace.vics.config;
+package com.victoryspace.vics.common.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

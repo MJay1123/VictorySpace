@@ -1,5 +1,7 @@
 package com.victoryspace.vics.vote.query.service;
 
+import com.victoryspace.vics.common.error.ErrorCode;
+import com.victoryspace.vics.vote.exception.VoteException;
 import com.victoryspace.vics.vote.query.dto.response.VoteQueryCountDTO;
 import com.victoryspace.vics.vote.query.dto.response.VoteQueryDetailResponseDTO;
 import com.victoryspace.vics.vote.query.dto.request.VoteSearchDTO;
@@ -24,11 +26,20 @@ public class VoteQueryServiceImpl implements VoteQueryService {
     @Override
     public VoteQueryDetailResponseDTO findById(int id) {
         VoteQueryDetailResponseDTO detailDTO = mapper.findById(id);
-        VoteQueryCountDTO countDTO = mapper.findVoteCounts(id);
+        if(detailDTO == null) {
+            throw new VoteException(ErrorCode.VOTE_NOT_FOUND);
+        }
 
-        detailDTO.setHomeCount(countDTO.getHomeCount());
-        detailDTO.setAwayCount(countDTO.getAwayCount());
-        detailDTO.setNeutralCount(countDTO.getNeutralCount());
+        VoteQueryCountDTO countDTO = mapper.findVoteCounts(id);
+        if(countDTO == null) {
+            detailDTO.setHomeCount(0);
+            detailDTO.setAwayCount(0);
+            detailDTO.setNeutralCount(0);
+        } else {
+            detailDTO.setHomeCount(countDTO.getHomeCount());
+            detailDTO.setAwayCount(countDTO.getAwayCount());
+            detailDTO.setNeutralCount(countDTO.getNeutralCount());
+        }
 
         return detailDTO;
     }
