@@ -20,90 +20,145 @@
         <result property="endedAt" column="ended_at"/>
     </resultMap>
 
-    <select id="findAll" resultMap="VoteResultMap">
-        SELECT id,
-               title,
-               category_id,
-               member_id,
-               content,
-               challenger_id,
-               challenger_content,
-               created_at,
-               updated_at,
-               deleted_at,
-               duration,
-               ended_at
-        FROM vote
-    </select>
+    <resultMap id="VoteListResponse"
+               type="com.victoryspace.vics.vote.query.dto.response.VoteQueryListResponseDTO">
+        <id property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="categoryName" column="category_name"/>
+        <result property="memberNickname" column="member_nickname"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="duration" column="duration"/>
+        <result property="endedAt" column="ended_at"/>
+    </resultMap>
 
-    <select id="findById" resultMap="VoteResultMap">
-        SELECT id,
-               title,
-               category_id,
-               member_id,
-               content,
-               challenger_id,
-               challenger_content,
-               created_at,
-               updated_at,
-               deleted_at,
-               duration,
-               ended_at
-        FROM vote
-        WHERE id = #{id}
-    </select>
+    <resultMap id="VoteDetailResponse"
+               type="com.victoryspace.vics.vote.query.dto.response.VoteQueryDetailResponseDTO">
+        <id property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="categoryName" column="category_name"/>
+        <result property="memberNickname" column="member_nickname"/>
+        <result property="content" column="content"/>
+        <result property="challengerNickname" column="challenger_nickname"/>
+        <result property="challengerContent" column="challenger_content"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="duration" column="duration"/>
+        <result property="endedAt" column="ended_at"/>
+    </resultMap>
 
-    <select id="findByMemberId" resultMap="VoteResultMap">
-        SELECT id,
-               title,
-               category_id,
-               member_id,
-               content,
-               challenger_id,
-               challenger_content,
-               created_at,
-               updated_at,
-               deleted_at,
-               duration,
-               ended_at
-        FROM vote
-        WHERE member_id = #{memberId}
-    </select>
-
-    <select id="findByChallengerId" resultMap="VoteResultMap">
-        SELECT id,
-               title,
-               category_id,
-               member_id,
-               content,
-               challenger_id,
-               challenger_content,
-               created_at,
-               updated_at,
-               deleted_at,
-               duration,
-               ended_at
-        FROM vote
-        WHERE challenger_id = #{challengerId}
-    </select>
-
-    <select id="search" resultMap="VoteResultMap">
-        SELECT v.*
+    <select id="findAll" resultMap="VoteListResponse">
+        SELECT v.id,
+               v.title,
+               c.name as category_name,
+               m.nickname as member_nickname,
+               v.created_at,
+               v.updated_at,
+               v.duration,
+               v.ended_at
         FROM vote v
-        JOIN member m ON v.member_id = m.id
+        JOIN category c ON c.id = v.category_id
+        JOIN member m ON m.id = v.member_id
+        ORDER BY v.created_at DESC
+    </select>
+
+    <select id="findById" resultMap="VoteDetailResponse">
+        SELECT
+            v.id,
+            v.title,
+            c.name as category_name,
+            m.nickname as member_nickname,
+            v.content,
+            ch.nickname as challenger_nickname,
+            v.challenger_content,
+            v.created_at,
+            v.updated_at,
+            v.duration,
+            v.ended_at
+        FROM vote v
+        JOIN category c ON v.category_id = c.id
+        JOIN member m ON m.id = v.member_id = m.id
+        LEFT JOIN member ch ON ch.id = v.challenger_id
+        WHERE v.id = #{id}
+        AND v.deleted_at IS NULL
+    </select>
+
+    <select id="findVoteCounts" resultType="com.victoryspace.vics.vote.query.dto.response.VoteQueryCountDTO">
+        SELECT
+            SUM(CASE WHEN vt.content = 'home' THEN 1 ELSE 0 END) AS homeCount,
+            SUM(CASE WHEN vt.content = 'away' THEN 1 ELSE 0 END) AS awayCount,
+            SUM(CASE WHEN vt.content = 'neutral' THEN 1 ELSE 0 END) AS neutralCount
+        FROM vote v
+        JOIN voter vt ON v.id = vt.vote_id
+        WHERE v.id = #{id}
+    </select>
+
+    <select id="findByMemberId" resultMap="VoteListResponse">
+        SELECT
+            v.id,
+            v.title,
+            c.name as category_name,
+            m.nickname as member_nickname,
+            v.created_at,
+            v.updated_at,
+            v.duration,
+            v.ended_at
+        FROM vote v
+        JOIN category c ON c.id = v.category_id
+        JOIN member m ON m.id = v.member_id
+        WHERE v.member_id = #{memberId}
+        ORDER BY v.created_at DESC
+    </select>
+
+    <select id="findByChallengerId" resultMap="VoteListResponse">
+        SELECT
+            v.id,
+            v.title,
+            c.name as category_name,
+            m.nickname as member_nickname,
+            v.created_at,
+            v.updated_at,
+            v.duration,
+            v.ended_at
+        FROM vote v
+        JOIN category c ON c.id = v.category_id
+        JOIN member m ON m.id = v.member_id
+        WHERE v.challenger_id = #{challengerId}
+        ORDER BY v.created_at DESC
+    </select>
+
+    <select id="search" resultMap="VoteListResponse">
+        SELECT
+            v.id,
+            v.title,
+            c.name AS category_name,
+            m.nickname AS member_nickname,
+            v.created_at,
+            v.updated_at,
+            v.duration,
+            v.ended_at
+        FROM vote v
+        JOIN category c ON c.id = v.category_id
+        JOIN member m ON m.id = v.member_id
         <where>
+            v.deleted_at IS NULL
+
             <if test="title != null and title != ''">
                 AND v.title LIKE CONCAT('%', #{title}, '%')
             </if>
+
             <if test="categoryId != null">
                 AND v.category_id = #{categoryId}
             </if>
+
             <if test="nickname != null and nickname != ''">
                 AND m.nickname LIKE CONCAT('%', #{nickname}, '%')
             </if>
+
             <if test="content != null and content != ''">
                 AND v.content LIKE CONCAT('%', #{content}, '%')
             </if>
         </where>
+        ORDER BY v.created_at DESC
     </select>
 </mapper>

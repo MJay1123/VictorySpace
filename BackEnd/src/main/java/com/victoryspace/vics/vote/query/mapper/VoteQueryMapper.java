@@ -1,20 +1,23 @@
 package com.victoryspace.vics.vote.query.mapper;
 
-import com.victoryspace.vics.vote.query.dto.VoteQueryDTO;
-import com.victoryspace.vics.vote.query.dto.VoteSearchDTO;
+import com.victoryspace.vics.vote.query.dto.response.VoteQueryCountDTO;
+import com.victoryspace.vics.vote.query.dto.response.VoteQueryDetailResponseDTO;
+import com.victoryspace.vics.vote.query.dto.response.VoteQueryListResponseDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
 @Mapper
 public interface VoteQueryMapper {
-    List<VoteQueryDTO> findAll();
+    List<VoteQueryListResponseDTO> findAll();
 
-    VoteQueryDTO findById(int id);
+    VoteQueryDetailResponseDTO findById(int id);
 
-    List<VoteQueryDTO> findByMemberId(int memberId);
+    List<VoteQueryListResponseDTO> findByMemberId(int memberId);
 
-    List<VoteQueryDTO> findByChallengerId(int challengerId);
+    List<VoteQueryListResponseDTO> findByChallengerId(int challengerId);
 
-    List<VoteQueryDTO> search(String title, Integer categoryId, String nickname, String content);
+    List<VoteQueryListResponseDTO> search(String title, Integer categoryId, String nickname, String content);
+
+    VoteQueryCountDTO findVoteCounts(int id);
 }

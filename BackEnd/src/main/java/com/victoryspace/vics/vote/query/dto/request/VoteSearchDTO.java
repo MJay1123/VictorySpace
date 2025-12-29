@@ -1,4 +1,4 @@
-package com.victoryspace.vics.vote.query.dto;
+package com.victoryspace.vics.vote.query.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
