@@ -14,6 +14,9 @@ public enum ErrorCode {
     // Auth
     AUTHORIZATION_NOT_FOUND(HttpStatus.NOT_FOUND, "AUTH-001",  "인증 정보가 없습니다."),
     WRONG_AUTHORIZATION(HttpStatus.BAD_REQUEST, "AUTH-002", "잘못된 인증 주체입니다."),
+    EMAIL_NOT_FOUND(HttpStatus.NOT_FOUND, "AUTH-003", "존재하지 않는 이메일입니다."),
+    EMAIL_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "AUTH-004", "이메일이 이미 존재합니다."),
+    NICKNAME_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "AUTH-005", "닉네임이 이미 존재합니다."),
 
     // Vote
     VOTE_NOT_FOUND(HttpStatus.NOT_FOUND, "VOTE-001",  "존재하지 않는 투표입니다."),

@@ -1,6 +1,8 @@
 package com.victoryspace.vics.auth.service;
 
 import com.victoryspace.vics.auth.dto.CustomUserDetails;
+import com.victoryspace.vics.auth.exception.AuthException;
+import com.victoryspace.vics.common.error.ErrorCode;
 import com.victoryspace.vics.member.command.domain.aggregate.MemberEntity;
 import com.victoryspace.vics.member.command.domain.repository.MemberRepository;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,7 +22,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         MemberEntity memberEntity = memberRepository.findByEmail(email);
         if(memberEntity == null){
-            throw new UsernameNotFoundException("존재하지 않는 이메일입니다." + email);
+            throw new AuthException(ErrorCode.EMAIL_NOT_FOUND);
         }
         return new CustomUserDetails(memberEntity);
     }

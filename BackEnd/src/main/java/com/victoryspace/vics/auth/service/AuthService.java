@@ -1,6 +1,8 @@
 package com.victoryspace.vics.auth.service;
 
 import com.victoryspace.vics.auth.dto.AuthDTO;
+import com.victoryspace.vics.auth.exception.AuthException;
+import com.victoryspace.vics.common.error.ErrorCode;
 import com.victoryspace.vics.member.command.domain.aggregate.MemberEntity;
 import com.victoryspace.vics.member.command.domain.repository.MemberRepository;
 import org.springframework.http.HttpStatus;
@@ -25,12 +27,12 @@ public class AuthService {
         String email = authDTO.getEmail();
         boolean emailExists = memberRepository.existsByEmail(email);
         if(emailExists){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already exists");
+            throw new AuthException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
         String nickname =  authDTO.getNickname();
         boolean nicknameExists = memberRepository.existsByNickname(nickname);
         if(nicknameExists){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nickname already exists");
+            throw new AuthException(ErrorCode.NICKNAME_ALREADY_EXISTS);
         }
         String name = authDTO.getName();
         String gender = authDTO.getGender();
