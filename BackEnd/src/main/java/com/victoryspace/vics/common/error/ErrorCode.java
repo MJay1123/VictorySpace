@@ -21,7 +21,11 @@ public enum ErrorCode {
     VOTE_SELF_CHALLENGED(HttpStatus.BAD_REQUEST, "VOTE-003", "자신의 투표에 도전할 수 없습니다."),
 
     // Voter
-    ALREADY_VOTED(HttpStatus.BAD_REQUEST, "VOTER-001",  "이미 투표에 참여했습니다.");
+    ALREADY_VOTED(HttpStatus.BAD_REQUEST, "VOTER-001",  "이미 투표에 참여했습니다."),
+
+    // Comment
+    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "COMMENT-001", "존재하지 않는 댓글입니다.")
+    ;
 
     private final HttpStatus status;
     private final String code;

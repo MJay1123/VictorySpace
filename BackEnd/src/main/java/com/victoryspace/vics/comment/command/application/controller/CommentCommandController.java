@@ -1,6 +1,11 @@
 package com.victoryspace.vics.comment.command.application.controller;
 
 import com.victoryspace.vics.comment.command.application.dto.CommentCommandDTO;
+import com.victoryspace.vics.comment.command.application.dto.request.CommentCreateRequestDTO;
+import com.victoryspace.vics.comment.command.application.dto.request.CommentUpdateRequestDTO;
+import com.victoryspace.vics.comment.command.application.dto.response.CommentCreateResponseDTO;
+import com.victoryspace.vics.comment.command.application.dto.response.CommentDeleteResponseDTO;
+import com.victoryspace.vics.comment.command.application.dto.response.CommentUpdateResponseDTO;
 import com.victoryspace.vics.comment.command.application.service.CommentCommandService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -16,20 +21,17 @@ public class CommentCommandController {
     }
 
     @PostMapping
-    public CommentCommandDTO createComment(@RequestBody CommentCommandDTO dto) {
-        CommentCommandDTO createdDto = commandService.createComment(dto);
-        return createdDto;
+    public CommentCreateResponseDTO createComment(@RequestBody CommentCreateRequestDTO requestDTO) {
+        return commandService.createComment(requestDTO);
     }
 
     @PatchMapping("/{id}")
-    public CommentCommandDTO updateComment(@PathVariable Integer id, @RequestBody CommentCommandDTO dto) {
-        CommentCommandDTO updatedDto = commandService.updateComment(id, dto);
-        return updatedDto;
+    public CommentUpdateResponseDTO updateComment(@PathVariable Integer id, @RequestBody CommentUpdateRequestDTO requestDTO) {
+        return commandService.updateComment(id, requestDTO);
     }
 
     @DeleteMapping("/{id}")
-    public CommentCommandDTO deleteComment(@PathVariable Integer id) {
-        CommentCommandDTO deletedDto = commandService.deleteComment(id);
-        return deletedDto;
+    public CommentDeleteResponseDTO deleteComment(@PathVariable Integer id) {
+        return commandService.deleteComment(id);
     }
 }
