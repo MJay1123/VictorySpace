@@ -11,6 +11,10 @@ public enum ErrorCode {
     // Common
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON-001", "서버 오류가 발생했습니다."),
 
+    // Auth
+    AUTHORIZATION_NOT_FOUND(HttpStatus.NOT_FOUND, "AUTH-001",  "인증 정보가 없습니다."),
+    WRONG_AUTHORIZATION(HttpStatus.BAD_REQUEST, "AUTH-002", "잘못된 인증 주체입니다."),
+
     // Vote
     VOTE_NOT_FOUND(HttpStatus.NOT_FOUND, "VOTE-001",  "존재하지 않는 투표입니다."),
     VOTE_ALREADY_CHALLENGED(HttpStatus.BAD_REQUEST, "V0TE-002",  "이미 경쟁자가 할당된 투표입니다."),

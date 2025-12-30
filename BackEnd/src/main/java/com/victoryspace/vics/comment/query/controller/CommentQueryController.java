@@ -1,6 +1,7 @@
 package com.victoryspace.vics.comment.query.controller;
 
 import com.victoryspace.vics.comment.query.dto.CommentQueryDTO;
+import com.victoryspace.vics.comment.query.dto.response.VoteCommentResponseDTO;
 import com.victoryspace.vics.comment.query.service.CommentQueryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -27,8 +28,8 @@ public class CommentQueryController {
         return dto;
     }
     @GetMapping("/vote/{voteId}")
-    public List<CommentQueryDTO> findByVoteId(@PathVariable("voteId") int voteId){
-        List<CommentQueryDTO> dtoList = queryService.findByVoteId(voteId);
+    public List<VoteCommentResponseDTO> findByVoteId(@PathVariable("voteId") int voteId){
+        List<VoteCommentResponseDTO> dtoList = queryService.findByVoteId(voteId);
         return dtoList;
     }
     @GetMapping("/member/{memberId}")

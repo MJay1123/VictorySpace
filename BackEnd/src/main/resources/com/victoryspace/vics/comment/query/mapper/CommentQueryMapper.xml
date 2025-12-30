@@ -15,6 +15,26 @@
         <result property="deletedAt" column="deleted_at"/>
     </resultMap>
 
+    <resultMap id="VoteCommentDTO"
+               type="com.victoryspace.vics.comment.query.dto.response.VoteCommentDTO">
+        <result property="id" column="id"/>
+        <result property="memberNickname" column="member_nickname"/>
+        <result property="content" column="content"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="canEdit" column="can_edit"/>
+    </resultMap>
+
+    <resultMap id="VoteCommentResponse"
+               type="com.victoryspace.vics.comment.query.dto.response.VoteCommentResponseDTO">
+        <result property="id" column="id"/>
+        <result property="memberNickname" column="member_nickname"/>
+        <result property="content" column="content"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="canEdit" column="can_edit"/>
+    </resultMap>
+
     <select id="findAll" resultMap="CommentResultMap">
         SELECT id,
                vote_id,
@@ -38,16 +58,17 @@
         WHERE id = #{id}
     </select>
 
-    <select id="findByVoteId" resultMap="CommentResultMap">
-        SELECT id,
-               vote_id,
-               member_id,
-               content,
-               created_at,
-               updated_at,
-               deleted_at
-        FROM comment
-        WHERE vote_id = #{voteId}
+    <select id="findByVoteId" resultMap="VoteCommentDTO">
+        SELECT c.id,
+               c.member_id,
+               m.nickname as member_nickname,
+               c.content,
+               c.created_at,
+               c.updated_at
+        FROM comment c
+        JOIN member m ON m.id = c.member_id
+        WHERE c.vote_id = #{voteId}
+        AND c.deleted_at IS NULL
     </select>
 
     <select id="findByMemberId" resultMap="CommentResultMap">

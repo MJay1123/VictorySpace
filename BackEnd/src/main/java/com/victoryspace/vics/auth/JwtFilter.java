@@ -25,51 +25,43 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String requestURI = request.getRequestURI();
 
-        // 회원가입 / 로그인 요청은 JWT 검증 제외
         if (requestURI.startsWith("/api/auth")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // Request에서 Authorization 헤더를 찾음
         String authorization = request.getHeader("Authorization");
-
-        // Authorization 헤더 검증
         if(authorization == null || !authorization.startsWith("Bearer ")){
             System.out.println("token is null");
             filterChain.doFilter(request, response);
-
-            // 조건이 해당되면 메소드 종료 (필수)
             return;
         }
 
         String token = authorization.substring(7);
-//        String token = authorization.split(" ")[1];
-
         if(!jwtUtil.validateToken(token)){
             System.out.println("token is invalid");
             filterChain.doFilter(request, response);
             return;
         }
-
-        // 토큰 소멸 시간 검증
         if(jwtUtil.isExpired(token)){
             System.out.println("token is expired");
             filterChain.doFilter(request, response);
             return;
         }
 
+        Integer memberId = jwtUtil.getMemberId(token);
         String email = jwtUtil.getEmail(token);
         String role = jwtUtil.getRole(token);
 
-        MemberEntity memberEntity = new  MemberEntity();
+        MemberEntity memberEntity = new MemberEntity();
+        memberEntity.setId(memberId);
         memberEntity.setEmail(email);
         memberEntity.setPassword("temp");
         memberEntity.setRole(role);
 
         CustomUserDetails customUserDetails = new CustomUserDetails(memberEntity);
 
-        Authentication authToken = new UsernamePasswordAuthenticationToken(email, null, customUserDetails.getAuthorities());
+        Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
 
         SecurityContextHolder.getContext().setAuthentication(authToken);
 

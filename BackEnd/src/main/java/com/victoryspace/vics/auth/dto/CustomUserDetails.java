@@ -27,6 +27,8 @@ public class CustomUserDetails implements UserDetails {
         return authorities;
     }
 
+    public Integer getMemberId() { return memberEntity.getId(); }
+
     @Override
     public String getUsername() {
         return memberEntity.getEmail();

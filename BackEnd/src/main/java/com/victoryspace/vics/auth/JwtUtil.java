@@ -26,6 +26,15 @@ public class JwtUtil {
         }
     }
 
+    public Integer getMemberId(String token) {
+        return Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("memberId", Integer.class);
+    }
+
     public String getEmail(String token) {
         return Jwts.parser()
                 .verifyWith(secretKey)
@@ -52,8 +61,10 @@ public class JwtUtil {
 
         return expiration.before(new Date()); // true = expired
     }
-    public String createToken(String email, String role, Long expiredMs) {
+
+    public String createToken(Integer memberId, String email, String role, Long expiredMs) {
         return Jwts.builder()
+                .claim("memberId", memberId)
                 .claim("email", email)
                 .claim("role", role)
                 .issuedAt(new Date(System.currentTimeMillis()))
