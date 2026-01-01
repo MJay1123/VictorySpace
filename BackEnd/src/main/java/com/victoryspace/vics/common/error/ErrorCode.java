@@ -20,6 +20,7 @@ public enum ErrorCode {
 
     // Member
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER-001", "회원 정보가 존재하지 않습니다."),
+    DELETED_MEMBER(HttpStatus.BAD_REQUEST, "MEMBER-002", "이미 삭제된 회원입니다."),
 
     // Vote
     VOTE_NOT_FOUND(HttpStatus.NOT_FOUND, "VOTE-001",  "존재하지 않는 투표입니다."),

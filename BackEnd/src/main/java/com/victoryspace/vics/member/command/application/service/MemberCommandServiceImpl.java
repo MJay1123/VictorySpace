@@ -8,6 +8,7 @@ import com.victoryspace.vics.member.command.application.dto.response.MemberUpdat
 import com.victoryspace.vics.member.command.application.mapper.MemberCommandMapper;
 import com.victoryspace.vics.member.command.domain.aggregate.MemberEntity;
 import com.victoryspace.vics.member.command.domain.repository.MemberRepository;
+import com.victoryspace.vics.member.exception.MemberException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,9 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     public MemberUpdateReponseDTO updateMember(Integer id, MemberUpdateRequestDTO requestDTO) {
         MemberEntity entity = memberRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+        if(entity.getDeletedAt() != null){
+            throw new MemberException(ErrorCode.DELETED_MEMBER);
+        }
         entity.update(
                 requestDTO.getNickname(),
                 requestDTO.getPassword(),
@@ -37,6 +41,9 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     public MemberDeleteResponseDTO deleteMember(Integer id) {
         MemberEntity entity = memberRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+        if(entity.getDeletedAt() != null){
+            throw new MemberException(ErrorCode.DELETED_MEMBER);
+        }
         entity.delete();
         memberRepository.save(entity);
         return memberCommandMapper.toDeleteResponseDTO(entity);
