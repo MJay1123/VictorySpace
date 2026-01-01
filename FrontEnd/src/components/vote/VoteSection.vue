@@ -7,13 +7,12 @@
             <VoteActionMenu v-if="canEdit" class="action-menu" @edit="openUpdate" @delete="openDelete" />
         </div>
 
-        <p v-if="category" class="category">{{ category.name }}</p>
+        <p v-if="category" class="category">{{ vote.categoryName }}</p>
 
         <!-- 메타 정보 -->
         <div class="meta">
-            <span>📌 생성자: <strong>{{ ownerNickname }}</strong></span>
-            <span v-if="challengerNickname">
-                ⚔️ 도전자: <strong>{{ challengerNickname }}</strong>
+            <span>📌 생성자: <strong>{{ vote.memberNickname }}</strong></span>
+            <span>⚔️ 도전자: <strong>{{ vote.challengerNickname ?? '도전자가 없습니다.' }}</strong>
             </span>
         </div>
 
@@ -24,7 +23,7 @@
                 <div class="side home" :class="{ selected: userVote?.content === 'home' }">
                     <div class="side-header">
                         <h3>🏠 Home</h3>
-                        <div class="vote-count">{{ counts.home }}표</div>
+                        <div class="vote-count">{{ vote.homeCount }}표</div>
                     </div>
                     <div class="side-content">
                         <p>{{ vote.content }}</p>
@@ -44,12 +43,12 @@
                 <div class="side away" :class="{ selected: userVote?.content === 'away' }">
                     <div class="side-header">
                         <h3>⚔️ Away</h3>
-                        <div class="vote-count">{{ counts.away }}표</div>
+                        <div class="vote-count">{{ vote.awayCount }}표</div>
                     </div>
                     <div class="side-content">
                         <p>{{ vote.challengerContent || '도전자가 없습니다.' }}</p>
                     </div>
-                    <label v-if="vote.challengerId" class="select-label">
+                    <label v-if="vote.challengerNickname" class="select-label">
                         <input type="radio" value="away" v-model="selectedOption" :disabled="Boolean(userVote)" />
                         <span>선택</span>
                     </label>
@@ -64,7 +63,7 @@
                 <div class="side neutral" :class="{ selected: userVote?.content === 'neutral' }">
                     <div class="neutral-header">
                         <h4>⚖️ Neutral</h4>
-                        <span class="neutral-count">{{ counts.neutral }}표</span>
+                        <span class="neutral-count">{{ vote.neutralCount }}표</span>
                     </div>
                     <label class="neutral-select">
                         <input type="radio" value="neutral" v-model="selectedOption" :disabled="Boolean(userVote)" />
@@ -106,8 +105,6 @@ import VotersGraphModal from './VotersGraphModal.vue'
 
 import voteApi from '@/api/voteApi'
 import voterApi from '../../api/voterApi'
-import memberApi from '@/api/memberApi'
-import categoryApi from '@/api/categoryApi'
 
 const router = useRouter()
 const props = defineProps({
@@ -116,13 +113,9 @@ const props = defineProps({
 
 const vote = ref({})
 const category = ref(null)
-const ownerNickname = ref('')
-const challengerNickname = ref('')
 const voters = ref([])
 const userVote = ref(null)
 const selectedOption = ref(null)
-
-const counts = ref({ home: 0, away: 0, neutral: 0 })
 
 const user = computed(() => {
     try {
@@ -148,20 +141,6 @@ const refresh = async () => {
     const { data } = await voteApi.findById(props.voteId)
     vote.value = data
 
-    if (vote.value.categoryId) {
-        const categoryRes = await categoryApi.findAll()
-        category.value = categoryRes.data.find(c => c.id === vote.value.categoryId)
-    }
-
-    const voterRes = await voterApi.findByVoteId(props.voteId)
-    voters.value = voterRes.data
-
-    counts.value = {
-        home: voters.value.filter(v => v.content === 'home').length,
-        away: voters.value.filter(v => v.content === 'away').length,
-        neutral: voters.value.filter(v => v.content === 'neutral').length
-    }
-
     if (user.value) {
         try {
             const uv = await voterApi.findByVoteAndMemberId(props.voteId, user.value.id)
@@ -171,17 +150,13 @@ const refresh = async () => {
             userVote.value = null
         }
     }
-
-    const owner = await memberApi.findById(vote.value.memberId)
-    ownerNickname.value = owner.data.nickname
-
-    if (vote.value.challengerId) {
-        const challenger = await memberApi.findById(vote.value.challengerId)
-        challengerNickname.value = challenger.data.nickname
-    }
 }
 
 const handleVote = async content => {
+    console.log('user:', user.value)
+    console.log('userId:', user.value?.id)
+    console.log('voteId:', props.voteId)
+    console.log('content:', content)
     await voterApi.createVoter({
         voteId: props.voteId,
         memberId: user.value.id,

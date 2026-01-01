@@ -7,11 +7,11 @@
 
       <div class="left">
         <h3 class="title">{{ vote.title }}</h3>
-        <p class="content">{{ vote.content }}</p>
+        <p class="category">{{ vote.categoryName }}</p>
       </div>
 
       <div class="right">
-        <p class="nickname">작성자 : <b>{{ vote.nickname ?? '불러오는 중...' }}</b></p>
+        <p class="nickname">작성자 : <b>{{ vote.memberNickname ?? '불러오는 중...' }}</b></p>
         <p class="date">{{ formatDate(vote.createdAt) }}</p>
       </div>
     </div>
@@ -61,7 +61,7 @@ const formatDate = (dateString) => {
 const fetchVotes = async () => {
   try {
     const res = await voteApi.findAll();
-    const voteList = res.data.filter(vote => vote.deletedAt === null);
+    const voteList = res.data
 
     // 🔥 memberId 기반 닉네임 조회
     for (const vote of voteList) {
@@ -137,7 +137,7 @@ const goVoteDetail = (voteId) => {
   margin: 0 0 4px;
 }
 
-.content {
+.category {
   font-size: 14px;
   color: #555;
 }
