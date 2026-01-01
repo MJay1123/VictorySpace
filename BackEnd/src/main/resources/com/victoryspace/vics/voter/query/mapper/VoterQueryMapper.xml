@@ -12,6 +12,13 @@
         <result property="content" column="content"/>
     </resultMap>
 
+    <resultMap id="VoterList"
+               type="com.victoryspace.vics.voter.query.dto.response.VoterListDTO">
+        <result property="id" column="id"/>
+        <result property="memberNickname" column="member_nickname"/>
+        <result property="content" column="content"/>
+    </resultMap>
+
     <select id="findAll" resultMap="VoterResultMap">
         SELECT id,
                vote_id,
@@ -29,12 +36,12 @@
         WHERE id = #{id}
     </select>
 
-    <select id="findByVoteId" resultMap="VoterResultMap">
-        SELECT id,
-               vote_id,
-               member_id,
-               content
-        FROM voter
+    <select id="findByVoteId" resultMap="VoterList">
+        SELECT vt.id,
+               m.nickname as member_nickname,
+               vt.content
+        FROM voter vt
+        JOIN member m ON vt.member_id = m.id
         WHERE vote_id = #{voteId}
     </select>
 

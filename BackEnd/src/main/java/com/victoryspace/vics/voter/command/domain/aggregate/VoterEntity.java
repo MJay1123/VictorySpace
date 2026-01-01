@@ -1,18 +1,13 @@
 package com.victoryspace.vics.voter.command.domain.aggregate;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "voter")
 public class VoterEntity {
     @Id
@@ -28,4 +23,12 @@ public class VoterEntity {
 
     @Column(name = "content")
     private String content;
+
+    public static VoterEntity create(Integer voteId, Integer mdmeberId, String content) {
+        VoterEntity voterEntity = new VoterEntity();
+        voterEntity.voteId = voteId;
+        voterEntity.memberId = mdmeberId;
+        voterEntity.content = content;
+        return voterEntity;
+    }
 }
