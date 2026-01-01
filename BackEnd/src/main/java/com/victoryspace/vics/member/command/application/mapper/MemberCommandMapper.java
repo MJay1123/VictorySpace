@@ -2,6 +2,8 @@ package com.victoryspace.vics.member.command.application.mapper;
 
 import com.victoryspace.vics.auth.dto.response.RegisterResponseDTO;
 import com.victoryspace.vics.member.command.application.dto.MemberCommandDTO;
+import com.victoryspace.vics.member.command.application.dto.response.MemberDeleteResponseDTO;
+import com.victoryspace.vics.member.command.application.dto.response.MemberUpdateResponseDTO;
 import com.victoryspace.vics.member.command.domain.aggregate.MemberEntity;
 import org.springframework.stereotype.Component;
 
@@ -34,6 +36,19 @@ public class MemberCommandMapper {
                 .nickname(entity.getNickname())
                 .email(entity.getEmail())
                 .createdAt(entity.getCreatedAt())
+                .build();
+    }
+
+    public MemberUpdateResponseDTO toUpdateResponseDTO(MemberEntity entity) {
+        return MemberUpdateResponseDTO.builder()
+                .nickname(entity.getNickname())
+                .profile(entity.getProfile())
+                .updatedAt(entity.getUpdatedAt())
+                .build();
+    }
+    public MemberDeleteResponseDTO toDeleteResponseDTO(MemberEntity entity) {
+        return MemberDeleteResponseDTO.builder()
+                .deletedAt(entity.getDeletedAt())
                 .build();
     }
 }

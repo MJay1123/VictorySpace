@@ -7,8 +7,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder
-public class MemberUpdateReponseDTO {
-    private Integer id;
+public class MemberUpdateResponseDTO {
     private String nickname;
     private String profile;
     private LocalDateTime updatedAt;

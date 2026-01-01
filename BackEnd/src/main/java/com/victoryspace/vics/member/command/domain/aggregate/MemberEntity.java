@@ -81,4 +81,15 @@ public class MemberEntity {
         memberEntity.setRole("ROLE_USER");
         return memberEntity;
     }
+
+    public void update(String nickname, String password, String profile){
+        this.nickname = nickname;
+        this.password = password;
+        this.profile = profile;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void delete() {
+        this.deletedAt = LocalDateTime.now();
+    }
 }

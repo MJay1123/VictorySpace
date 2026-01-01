@@ -8,6 +8,5 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class MemberDeleteResponseDTO {
-    private Integer id;
     private LocalDateTime deletedAt;
 }
