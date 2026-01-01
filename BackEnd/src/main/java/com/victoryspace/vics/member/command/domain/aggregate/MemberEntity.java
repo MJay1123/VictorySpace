@@ -59,4 +59,26 @@ public class MemberEntity {
 
     @Column(name = "role")
     private String role;
+
+    public static MemberEntity create(
+            String name,
+            String gender,
+            LocalDate birthday,
+            String nickname,
+            String password,
+            String email
+    ) {
+        MemberEntity memberEntity = new MemberEntity();
+        memberEntity.setName(name);
+        memberEntity.setGender(gender);
+        memberEntity.setBirthday(birthday);
+        memberEntity.setNickname(nickname);
+        memberEntity.setPassword(password);
+        memberEntity.setEmail(email);
+        memberEntity.setCreatedAt(LocalDateTime.now());
+        memberEntity.setGradeId(1);
+        memberEntity.setPoint(1000);
+        memberEntity.setRole("ROLE_USER");
+        return memberEntity;
+    }
 }

@@ -15,12 +15,6 @@ public class MemberCommandController {
         this.memberCommandService = memberCommandService;
     }
 
-    @PostMapping
-    public MemberCommandDTO createMember(@RequestBody MemberCommandDTO memberCommandDTO) {
-        MemberCommandDTO createdMemberCommandDTO = memberCommandService.createMember(memberCommandDTO);
-        return createdMemberCommandDTO;
-    }
-
     @PatchMapping("/{id}")
     public MemberCommandDTO updateMember(@PathVariable Integer id, @RequestBody MemberCommandDTO memberCommandDTO) {
         MemberCommandDTO updatedMemberCommandDTO = memberCommandService.updateMember(id, memberCommandDTO);

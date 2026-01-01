@@ -17,25 +17,6 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     private final MemberCommandMapper memberCommandMapper;
 
     @Override
-    public MemberCommandDTO createMember(MemberCommandDTO dto) {
-        MemberEntity entity = new MemberEntity();
-        entity.setName(dto.getName());
-        entity.setGender(dto.getGender());
-        entity.setBirthday(dto.getBirthday());
-        entity.setNickname(dto.getNickname());
-        entity.setPassword(dto.getPassword());
-        entity.setEmail(dto.getEmail());
-        entity.setCreatedAt(LocalDateTime.now());
-        entity.setUpdatedAt(LocalDateTime.now());
-        entity.setGradeId(dto.getGradeId());
-        entity.setProfile(dto.getProfile());
-        entity.setPoint(1000);
-        entity.setRole("ROLE_USER");
-        MemberEntity createdMemberEntity = memberRepository.save(entity);
-        return memberCommandMapper.toDto(createdMemberEntity);
-    }
-
-    @Override
     public MemberCommandDTO updateMember(Integer id, MemberCommandDTO dto) {
         MemberEntity entity = memberRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Member not found"));
