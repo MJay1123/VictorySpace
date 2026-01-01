@@ -23,7 +23,7 @@
             <!-- 🔥 위: 막대 + 원그래프 -->
             <div class="top-graphs">
                 <div class="graph-card">
-                    <VotersSection :voters="enrichedVoters" v-model:selectedType="selectedType" />
+                    <VotersSection :voters="voters" />
                 </div>
                 <div class="graph-card">
                     <GenderGraph :voters="filteredVoters" />
@@ -48,8 +48,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import memberApi from '@/api/memberApi'
+import { ref, computed, onMounted } from 'vue'
+import voterApi from '@/api/voterApi'
 
 import VotersSection from '../graph/VotersSection.vue'
 import GenderGraph from '../graph/GenderGraph.vue'
@@ -57,12 +57,14 @@ import AgeLineGraph from '../graph/AgeLineGraph.vue'
 import GenderAgeGraph from '../graph/GenderAgeGraph.vue'
 
 const props = defineProps({
-    voters: Array
+    voteId: {
+        type: Number,
+        required: true
+    }
 })
 
-const enrichedVoters = ref([])
+const voters = ref([])
 const selectedType = ref('total')
-const isTransitioning = ref(false)
 
 const getTypeLabel = (type) => {
     const labels = {
@@ -76,30 +78,24 @@ const getTypeLabel = (type) => {
 
 const updateSelectedType = (type) => {
     if (selectedType.value === type) return
-    isTransitioning.value = true
     selectedType.value = type
-    setTimeout(() => {
-        isTransitioning.value = false
-    }, 600)
 }
 
-onMounted(async () => {
-    enrichedVoters.value = await Promise.all(
-        props.voters.map(async v => {
-            const res = await memberApi.findById(v.memberId)
-            return {
-                ...v,
-                gender: res.data.gender,
-                birth: res.data.birthday
-            }
-        })
-    )
-})
+const fetchVoters = async () => {
+    try {
+        const res = await voterApi.findByVoteId(props.voteId)
+        voters.value = res.data
+    } catch (error) {
+        console.error('투표자 조회 실패', error)
+    }
+}
 
 const filteredVoters = computed(() => {
-    if (selectedType.value === 'total') return enrichedVoters.value
-    return enrichedVoters.value.filter(v => v.content === selectedType.value)
+    if (selectedType.value === 'total') return voters.value
+    return voters.value.filter(v => v.content === selectedType.value)
 })
+
+onMounted(fetchVoters)
 </script>
 
 <style scoped>

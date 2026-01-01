@@ -94,16 +94,6 @@
 
     </select>
 
-<!--    <select id="findVoteCounts" resultType="com.victoryspace.vics.vote.query.dto.response.VoteQueryCountDTO">-->
-<!--        SELECT-->
-<!--            COALESCE(SUM(CASE WHEN vt.content = 'home' THEN 1 ELSE 0 END), 0) AS homeCount,-->
-<!--            COALESCE(SUM(CASE WHEN vt.content = 'away' THEN 1 ELSE 0 END), 0) AS awayCount,-->
-<!--            COALESCE(SUM(CASE WHEN vt.content = 'neutral' THEN 1 ELSE 0 END), 0) AS neutralCount-->
-<!--        FROM vote v-->
-<!--        JOIN voter vt ON v.id = vt.vote_id-->
-<!--        WHERE v.id = #{id}-->
-<!--    </select>-->
-
     <select id="findByMemberId" resultMap="VoteListResponse">
         SELECT
             v.id,

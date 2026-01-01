@@ -76,21 +76,6 @@ const xGap = computed(() =>
 )
 
 /* -----------------------------
-   나이 계산
-------------------------------*/
-const getAge = birth => {
-    const today = new Date()
-    const b = new Date(birth)
-    let age = today.getFullYear() - b.getFullYear()
-
-    const m = today.getMonth() - b.getMonth()
-    if (m < 0 || (m === 0 && today.getDate() < b.getDate())) {
-        age--
-    }
-    return age
-}
-
-/* -----------------------------
    연령대 통계
 ------------------------------*/
 const ageStats = computed(() => {
@@ -98,7 +83,7 @@ const ageStats = computed(() => {
     ageBuckets.forEach(a => (result[a] = 0))
 
     props.voters.forEach(v => {
-        const age = getAge(v.birth)
+        const age = v.age
 
         for (let i = ageBuckets.length - 1; i >= 0; i--) {
             if (age >= ageBuckets[i]) {

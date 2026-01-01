@@ -8,5 +8,7 @@ import lombok.Getter;
 public class VoterListDTO {
     private Integer id;
     private String memberNickname;
+    private String gender;
+    private Integer age;
     private String content;
 }

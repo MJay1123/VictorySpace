@@ -27,11 +27,11 @@
 import { computed } from 'vue'
 
 const props = defineProps({
-    voters: Array,
-    selectedType: String
+    voters: {
+        type: Array,
+        required: true
+    }
 })
-
-defineEmits(['update:selectedType'])
 
 const stats = computed(() => ({
     home: props.voters.filter(v => v.content === 'home').length,
@@ -43,8 +43,9 @@ const total = computed(() =>
     stats.value.home + stats.value.away + stats.value.neutral
 )
 
-const rate = type =>
-    total.value ? Math.round((stats.value[type] / total.value) * 100) : 0
+const rate = (type) => {
+    return total.value ? Math.round((stats.value[type] / total.value) * 100) : 0
+}
 </script>
 
 <style scoped>

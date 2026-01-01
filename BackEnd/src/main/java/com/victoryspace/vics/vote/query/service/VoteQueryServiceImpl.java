@@ -30,8 +30,6 @@ public class VoteQueryServiceImpl implements VoteQueryService {
             throw new VoteException(ErrorCode.VOTE_NOT_FOUND);
         }
 
-//        VoteQueryCountDTO countDTO = mapper.findVoteCounts(id);
-
         return VoteQueryDetailResponseDTO.builder()
                 .id(detailDTO.getId())
                 .title(detailDTO.getTitle())

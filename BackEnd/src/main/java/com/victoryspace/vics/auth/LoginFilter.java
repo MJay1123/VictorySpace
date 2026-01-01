@@ -55,7 +55,12 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         response.setCharacterEncoding("UTF-8");
         // 🔥 프론트가 원하는 JSON 응답
         response.getWriter().write(
-                "{ \"email\": \"" + email + "\", \"role\": \"" + role + "\", \"token\": \"" + token + "\" }"
+                "{ " +
+                        "\"id\": " + memberId + "," +
+                        "\"email\": \"" + email + "\"," +
+                        "\"role\": \"" + role + "\"," +
+                        "\"token\": \"" + token + "\"" +
+                        " }"
         );
     }
 

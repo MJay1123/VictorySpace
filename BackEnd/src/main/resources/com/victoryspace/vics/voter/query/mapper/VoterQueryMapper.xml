@@ -16,6 +16,8 @@
                type="com.victoryspace.vics.voter.query.dto.response.VoterListDTO">
         <result property="id" column="id"/>
         <result property="memberNickname" column="member_nickname"/>
+        <result property="gender" column="gender"/>
+        <result property="age" column="age"/>
         <result property="content" column="content"/>
     </resultMap>
 
@@ -39,6 +41,8 @@
     <select id="findByVoteId" resultMap="VoterList">
         SELECT vt.id,
                m.nickname as member_nickname,
+               m.gender,
+               TIMESTAMPDIFF(YEAR, m.birthday, CURDATE()) AS age,
                vt.content
         FROM voter vt
         JOIN member m ON vt.member_id = m.id

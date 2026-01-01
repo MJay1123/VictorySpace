@@ -58,23 +58,16 @@ const handleLogin = async () => {
     const res = await authApi.login(email.value, password.value);
 
     const token = res.headers['authorization'] || res.headers['Authorization'];
+    
     if (token) {
       localStorage.setItem("token", token);
     }
 
-    const loginEmail = res.data.email;
-    const role = res.data.role;
-
-    const memberRes = await memberApi.findByEmail(loginEmail);
-
-    const userInfo = {
-      id: memberRes.data.id,
-      email: loginEmail,
-      nickname: memberRes.data.nickname,
-      role
-    }
-
-    localStorage.setItem('userInfo', JSON.stringify(userInfo))
+    localStorage.setItem('userInfo', JSON.stringify({
+      id: res.data.id,
+      email: res.data.email,
+      role: res.data.role
+    }));
 
     showWelcome.value = true;
 

@@ -11,7 +11,7 @@ export const extractBusinessError = (error) => {
     if (error?.businessError) {
         return error.businessError;
     }
-    
+
     if (error?.response?.data) {
         const data = error.response.data;
         if (data.success === false && data.name && data.code) {
@@ -24,7 +24,7 @@ export const extractBusinessError = (error) => {
             };
         }
     }
-    
+
     return null;
 };
 
@@ -34,7 +34,7 @@ export const extractBusinessError = (error) => {
  */
 export const logBusinessError = (businessError) => {
     if (!businessError) return;
-    
+
     console.log('🚨 BusinessException 발생:', {
         '에러 이름': businessError.name,
         '에러 코드': businessError.code,
@@ -51,19 +51,19 @@ export const logBusinessError = (businessError) => {
  */
 export const getErrorMessage = (error) => {
     const businessError = extractBusinessError(error);
-    
+
     if (businessError) {
         return businessError.message;
     }
-    
+
     if (error?.response?.data?.message) {
         return error.response.data.message;
     }
-    
+
     if (error?.message) {
         return error.message;
     }
-    
+
     return '알 수 없는 오류가 발생했습니다.';
 };
 
@@ -77,17 +77,17 @@ export const getErrorMessage = (error) => {
  */
 export const handleError = (error, options = {}) => {
     const { log = true, throw: shouldThrow = false } = options;
-    
+
     const businessError = extractBusinessError(error);
-    
+
     if (businessError && log) {
         logBusinessError(businessError);
     }
-    
+
     if (shouldThrow) {
         throw error;
     }
-    
+
     return businessError;
 };
 

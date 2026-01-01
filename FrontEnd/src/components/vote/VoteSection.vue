@@ -7,7 +7,7 @@
             <VoteActionMenu v-if="canEdit" class="action-menu" @edit="openUpdate" @delete="openDelete" />
         </div>
 
-        <p v-if="category" class="category">{{ vote.categoryName }}</p>
+        <p class="category">{{ vote.categoryName }}</p>
 
         <!-- 메타 정보 -->
         <div class="meta">
@@ -58,10 +58,15 @@
 
                     <!-- 도전자가 없을 때 -->
                     <div v-else>
-                        <input v-model="challengerContent" placeholder="도전자 내용을 입력하세요" />
-                        <button class="challenge-btn" @click="challengeVote">
-                            도전하기
-                        </button>
+                        <div class="challenger-box">
+                            <textarea class="challenger-content" v-model="challengerContent"
+                                placeholder="✍️ 도전 내용을 입력하세요" rows="4" />
+                            <div class="challenger-actions">
+                                <button class="challenge-btn" @click="challengeVote">
+                                    🔥 도전하기
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -93,7 +98,7 @@
         </button>
 
         <!-- ===== 모달 ===== -->
-        <VotersGraphModal v-if="showGraphModal" :voteId="voteId" :voters="voters" @close="showGraphModal = false" />
+        <VotersGraphModal v-if="showGraphModal" :voteId="vote.id" @close="showGraphModal = false" />
 
         <UpdateVoteModal v-if="showUpdateModal" :vote="vote" @close="showUpdateModal = false" @updated="refresh" />
 
@@ -116,12 +121,13 @@ import voterApi from '../../api/voterApi'
 
 const router = useRouter()
 const props = defineProps({
-    voteId: Number
+    voteId: {
+        type: Number,
+        required: true
+    }
 })
 
 const vote = ref({})
-const category = ref(null)
-const voters = ref([])
 const userVote = ref(null)
 const selectedOption = ref(null)
 const challengerContent = ref('')
@@ -136,7 +142,7 @@ const user = computed(() => {
 })
 
 const canEdit = computed(() =>
-    user.value && user.value.id === vote.value.memberId && !vote.value.challengerId
+    user && user.id === vote.value.memberId && !vote.value.challengerId
 )
 
 const showGraphModal = ref(false)
@@ -162,10 +168,6 @@ const refresh = async () => {
 }
 
 const handleVote = async content => {
-    console.log('user:', user.value)
-    console.log('userId:', user.value?.id)
-    console.log('voteId:', props.voteId)
-    console.log('content:', content)
     await voterApi.createVoter({
         voteId: props.voteId,
         memberId: user.value.id,
@@ -443,22 +445,68 @@ onMounted(refresh)
     transform: translateY(-4px);
 }
 
-.challenge-btn {
-    padding: 12px 24px;
-    background: rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(10px);
-    border: 2px solid rgba(255, 255, 255, 0.5);
-    border-radius: 12px;
-    color: white;
-    font-weight: 700;
+.challenger-box {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.challenger-content {
+    width: 100%;
+    min-height: 120px;
+    resize: none;
+
+    padding: 16px 18px;
     font-size: 16px;
+    line-height: 1.6;
+
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    outline: none;
+
+    transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.challenger-content::placeholder {
+    color: #aaa;
+    font-size: 15px;
+}
+
+.challenger-content:focus {
+    border-color: #5b7cff;
+    box-shadow: 0 0 0 4px rgba(91, 124, 255, 0.15);
+}
+
+.challenger-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+}
+
+.challenge-btn {
+    padding: 12px 26px;
+    font-size: 15px;
+    font-weight: 600;
+
+    color: #fff;
+    background: linear-gradient(135deg, #5b7cff, #6f8bff);
+    border: none;
+    border-radius: 999px;
+
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: transform 0.15s, box-shadow 0.15s;
 }
 
 .challenge-btn:hover {
-    background: rgba(255, 255, 255, 0.35);
-    transform: scale(1.05);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(91, 124, 255, 0.35);
+}
+
+.challenge-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 10px rgba(91, 124, 255, 0.25);
 }
 
 /* ===== Buttons ===== */

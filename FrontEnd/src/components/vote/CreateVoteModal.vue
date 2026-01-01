@@ -82,14 +82,11 @@ const createVote = async () => {
 
     const duration = `${durationNumber.value}${durationUnit.value}`
 
-    const userDTO = await memberApi.findByEmail(user.email);
-    const userId = userDTO.data.id;
-
     const voteDTO = {
         title: title.value,
         categoryId: selectedCategoryId.value,
         content: content.value,
-        memberId: userId,
+        memberId: user.id,
         duration: duration
     };
 

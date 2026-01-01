@@ -7,23 +7,23 @@
         <div class="info-content">
           <div class="info-item">
             <span class="info-label">이메일:</span>
-            <span class="info-value">{{ userInfo.email || '없음' }}</span>
+            <span class="info-value">{{ user?.email || '없음' }}</span>
           </div>
           <div class="info-item">
             <span class="info-label">이름:</span>
-            <span class="info-value">{{ userInfo.name || '없음' }}</span>
+            <span class="info-value">{{ user?.name || '없음' }}</span>
           </div>
           <div class="info-item">
             <span class="info-label">닉네임:</span>
-            <span class="info-value">{{ userInfo.nickname || '없음' }}</span>
+            <span class="info-value">{{ user?.nickname || '없음' }}</span>
           </div>
           <div class="info-item">
             <span class="info-label">성별:</span>
-            <span class="info-value">{{ getGenderText(userInfo.gender) }}</span>
+            <span class="info-value">{{ getGenderText(user?.gender) }}</span>
           </div>
           <div class="info-item">
             <span class="info-label">생년월일:</span>
-            <span class="info-value">{{ userInfo.birthday || '없음' }}</span>
+            <span class="info-value">{{ user?.birthday || '없음' }}</span>
           </div>
         </div>
       </div>
@@ -32,13 +32,13 @@
       <div class="matchup-section">
         <h3 class="section-title">내가 만든 매치업</h3>
         <div v-if="isLoadingCreated" class="loading">로딩 중...</div>
-        <div v-else-if="createdMatchups.length === 0" class="empty-message">만든 매치업이 없습니다.</div>
+        <div v-else-if="createdVotes.length === 0" class="empty-message">만든 매치업이 없습니다.</div>
         <div v-else class="matchup-list">
-          <div v-for="matchup in createdMatchups" :key="matchup.id" class="matchup-item"
-            @click="showMatchupDetail(matchup)">
-            <h4 class="matchup-title">{{ matchup.title }}</h4>
-            <p class="matchup-preview">{{ truncateContent(matchup.content) }}</p>
-            <span class="matchup-date">{{ formatDate(matchup.createdAt) }}</span>
+          <div v-for="vote in createdVotes" :key="vote.id" class="matchup-item"
+            @click="goVoteDetail(vote.id)">
+            <h4 class="matchup-title">{{ vote.title }}</h4>
+            <p class="matchup-preview">{{ truncateContent(vote.content) }}</p>
+            <span class="matchup-date">{{ formatDate(vote.createdAt) }}</span>
           </div>
         </div>
       </div>
@@ -47,54 +47,26 @@
       <div class="matchup-section">
         <h3 class="section-title">내가 참여한 매치업</h3>
         <div v-if="isLoadingChallenged" class="loading">로딩 중...</div>
-        <div v-else-if="challengedMatchups.length === 0" class="empty-message">참여한 매치업이 없습니다.</div>
+        <div v-else-if="challengedVotes.length === 0" class="empty-message">참여한 매치업이 없습니다.</div>
         <div v-else class="matchup-list">
-          <div v-for="matchup in challengedMatchups" :key="matchup.id" class="matchup-item"
-            @click="showMatchupDetail(matchup)">
-            <h4 class="matchup-title">{{ matchup.title }}</h4>
-            <p class="matchup-preview">{{ truncateContent(matchup.content) }}</p>
-            <span class="matchup-date">{{ formatDate(matchup.createdAt) }}</span>
+          <div v-for="vote in challengedVotes" :key="vote.id" class="matchup-item"
+            @click="goVoteDetail(vote.id)">
+            <h4 class="matchup-title">{{ vote.title }}</h4>
+            <p class="matchup-preview">{{ truncateContent(vote.content) }}</p>
+            <span class="matchup-date">{{ formatDate(vote.createdAt) }}</span>
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- 매치업 상세 보기 모달 -->
-    <div v-if="selectedMatchup" class="modal-overlay" @click="selectedMatchup = null">
-      <div class="modal-content" @click.stop>
-        <h3 class="modal-title">{{ selectedMatchup.title }}</h3>
-        <div class="matchup-detail">
-          <p class="matchup-content">{{ selectedMatchup.content }}</p>
-          <p v-if="selectedMatchup.challengerContent" class="challenger-content">
-            <strong>도전 내용:</strong> {{ selectedMatchup.challengerContent }}
-          </p>
-          <p class="matchup-date-info">작성일: {{ formatDate(selectedMatchup.createdAt) }}</p>
-        </div>
-        <button @click="selectedMatchup = null" class="close-button">닫기</button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import memberApi from '../api/memberApi'
+import { ref, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import voteApi from '../api/voteApi'
 
-const userInfo = ref({
-  email: '',
-  name: '',
-  nickname: '',
-  gender: '',
-  age: null,
-  id: null
-})
-
-const createdMatchups = ref([])
-const challengedMatchups = ref([])
-const isLoadingCreated = ref(false)
-const isLoadingChallenged = ref(false)
-const selectedMatchup = ref(null)
+const router = useRouter()
 
 const getGenderText = (gender) => {
   const genderMap = {
@@ -107,54 +79,43 @@ const getGenderText = (gender) => {
   return genderMap[gender] || '없음'
 }
 
-const fetchCreatedMatchups = async () => {
-  if (!userInfo.value.id) return
-
-  isLoadingCreated.value = true
+const user = computed(() => {
   try {
-    const response = await voteApi.findByMemberId(userInfo.value.id)
+    return JSON.parse(localStorage.getItem('userInfo'))
+  } catch (e){
+    console.log("유저 정보 로딩 실패", e)
+    return null
+  }
+})
 
-    // ✅ axios는 status로 성공 판단
-    if (response.status === 200) {
-      const data = response.data
+const createdVotes = ref([])
+const challengedVotes = ref([])
+const isLoadingCreated = ref(false)
+const isLoadingChallenged = ref(false)
 
-      createdMatchups.value = Array.isArray(data)
-        ? data.filter(vote => vote.deletedAt === null)
-        : []
-    } else {
-      console.error('내가 만든 매치업 조회 실패')
-    }
-  } catch (error) {
-    console.error('내가 만든 매치업 조회 오류:', error)
+const fetchCreatedVotes = async () => {
+  try {
+    const res = await voteApi.findByMemberId(user.value.id)
+    createdVotes.value = res.data
+  } catch (e) {
+    console.error('내가 생성한 매치업 조회 실패', e)
   } finally {
     isLoadingCreated.value = false
   }
 }
 
-const fetchChallengedMatchups = async () => {
-  if (!userInfo.value.id) return
-
+const fetchChallengedVotes = async () => {
+  if (!user.value?.id) return
+  
   isLoadingChallenged.value = true
   try {
-    const response = await voteApi.findByChallengerId(userInfo.value.id)
-
-    if (response.status === 200) {
-      const data = response.data
-      challengedMatchups.value = Array.isArray(data)
-        ? data.filter(vote => vote.deletedAt === null)
-        : []
-    } else {
-      console.error('내가 참여한 매치업 조회 실패')
-    }
-  } catch (error) {
-    console.error('내가 참여한 매치업 조회 오류:', error)
+    const res = await voteApi.findByChallengerId(user.value.id)
+    challengedVotes.value = res.data
+  } catch (e) {
+    console.error('내가 참여한 매치업 조회 실패', e)
   } finally {
     isLoadingChallenged.value = false
   }
-}
-
-const showMatchupDetail = (matchup) => {
-  selectedMatchup.value = { ...matchup }
 }
 
 const formatDate = (dateString) => {
@@ -168,29 +129,14 @@ const truncateContent = (content) => {
   return content.length > 100 ? content.substring(0, 100) + '...' : content
 }
 
+const goVoteDetail = (voteId) => {
+  router.push(`/main/votes/${voteId}`)
+}
+
 onMounted(async () => {
-  const savedUserInfo = localStorage.getItem('userInfo')
-
-  if (!savedUserInfo) return
-
-  // ✅ 문자열 → 객체 변환
-  const parsedUser = JSON.parse(savedUserInfo)
-
-  try {
-    // ✅ 비동기 처리
-    const memberRes = await memberApi.findById(parsedUser.id)
-
-    // ✅ 사용자 전체 정보 세팅
-    userInfo.value = memberRes.data
-
-    // ✅ userInfo.id 세팅 후에 매치업 조회
-    fetchCreatedMatchups()
-    fetchChallengedMatchups()
-  } catch (error) {
-    console.error('회원 정보 조회 실패:', error)
-  }
+  await fetchCreatedVotes()
+  await fetchChallengedVotes()
 })
-
 </script>
 
 <style scoped>
@@ -312,102 +258,4 @@ onMounted(async () => {
   color: #999;
 }
 
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  animation: fadeIn 0.3s;
-}
-
-.modal-content {
-  background: white;
-  border-radius: 12px;
-  padding: 2rem;
-  max-width: 600px;
-  width: 90%;
-  max-height: 80vh;
-  overflow-y: auto;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  animation: slideUp 0.3s;
-}
-
-.modal-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 1.5rem;
-}
-
-.matchup-detail {
-  margin-bottom: 1rem;
-}
-
-.matchup-content {
-  color: #333;
-  line-height: 1.6;
-  margin-bottom: 1rem;
-  white-space: pre-wrap;
-}
-
-.challenger-content {
-  color: #333;
-  line-height: 1.6;
-  margin-bottom: 1rem;
-  padding: 1rem;
-  background: #f8f9fa;
-  border-radius: 8px;
-  border-left: 3px solid #f44336;
-}
-
-.matchup-date-info {
-  color: #999;
-  font-size: 0.9rem;
-}
-
-.close-button {
-  background: #667eea;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  width: 100%;
-  margin-top: 1rem;
-  transition: background-color 0.3s;
-}
-
-.close-button:hover {
-  background: #5568d3;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
 </style>
