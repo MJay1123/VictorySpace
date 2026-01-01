@@ -46,4 +46,14 @@
         FROM `likes`
         WHERE member_id = #{memberId}
     </select>
+
+    <select id="findByVoteIdAndMemberId" resultMap="LikesResultMap">
+        SELECT id,
+               vote_id,
+               member_id,
+               created_at
+        FROM `likes`
+        WHERE vote_id = #{voteId}
+        AND member_id = #{memberId}
+    </select>
 </mapper>

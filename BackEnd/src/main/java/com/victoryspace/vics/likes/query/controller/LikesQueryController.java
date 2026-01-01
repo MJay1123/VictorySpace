@@ -40,4 +40,8 @@ public class LikesQueryController {
         List<LikesQueryDTO> dtoList = queryService.findByMemberId(memberId);
         return dtoList;
     }
+    @GetMapping("/member/vote/{voteId}/member/{memberId}")
+    public LikesQueryDTO findByVoteIdAndMemberId(@PathVariable("voteId") int voteId, @PathVariable("memberId") int memberId){
+        return queryService.findByVoteIdAndMemberId(voteId, memberId);
+    }
 }

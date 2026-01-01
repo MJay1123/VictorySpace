@@ -32,7 +32,12 @@ public enum ErrorCode {
     VOTER_NOT_FOUND(HttpStatus.NOT_FOUND, "VOTER-002", "존재하지 않는 투표자입니다."),
 
     // Comment
-    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "COMMENT-001", "존재하지 않는 댓글입니다.")
+    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "COMMENT-001", "존재하지 않는 댓글입니다."),
+
+    // Likes
+    LIKES_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "LIKES-001", "이미 좋아요가 존재합니다."),
+    LIKES_NOT_FOUMD(HttpStatus.NOT_FOUND, "LIKES-002", "좋아요가 존재하지 않습니다.")
+    // Bookmark
     ;
 
     private final HttpStatus status;
