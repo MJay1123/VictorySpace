@@ -1,19 +1,19 @@
 package com.victoryspace.vics.member.query.mapper;
 
-import com.victoryspace.vics.member.query.dto.MemberQueryDTO;
+import com.victoryspace.vics.member.query.dto.MemberInfoDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
 @Mapper
 public interface MemberQueryMapper {
-    List<MemberQueryDTO> findAll();
+    List<MemberInfoDTO> findAll();
 
-    MemberQueryDTO findById(int id);
+    MemberInfoDTO findById(int id);
 
-    List<MemberQueryDTO> findByNickname(String nickname);
+    List<MemberInfoDTO> findByNickname(String nickname);
 
-    MemberQueryDTO findByEmail(String email);
+    MemberInfoDTO findByEmail(String email);
 
-    List<MemberQueryDTO> orderByPoint(String direction);
+    List<MemberInfoDTO> orderByPoint(String direction);
 }

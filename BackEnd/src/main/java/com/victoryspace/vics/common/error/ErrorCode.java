@@ -18,6 +18,10 @@ public enum ErrorCode {
     EMAIL_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "AUTH-004", "이메일이 이미 존재합니다."),
     NICKNAME_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "AUTH-005", "닉네임이 이미 존재합니다."),
 
+    // Member
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER-001", "회원 정보가 존재하지 않습니다."),
+    DELETED_MEMBER(HttpStatus.BAD_REQUEST, "MEMBER-002", "이미 삭제된 회원입니다."),
+
     // Vote
     VOTE_NOT_FOUND(HttpStatus.NOT_FOUND, "VOTE-001",  "존재하지 않는 투표입니다."),
     VOTE_ALREADY_CHALLENGED(HttpStatus.BAD_REQUEST, "V0TE-002",  "이미 경쟁자가 할당된 투표입니다."),
