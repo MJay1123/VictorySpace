@@ -21,50 +21,32 @@ const router = createRouter({
   },
   routes: [
     {
-      path: '/',
-      component: StartPage,
+      path: '/', component: StartPage,
       children: [
-        {
-          path: '',
-          redirect: '/login'
-        },
-        {
-          path: 'login',
-          name: 'login',
-          component: LoginView
-        },
-        {
-          path: 'register',
-          name: 'register',
-          component: RegisterView
-        }
+        { path: '', redirect: '/login' },
+        { path: 'login', name: 'login', component: LoginView },
+        { path: 'register', name: 'register', component: RegisterView }
       ]
     },
     {
-      path: '/main',
-      component: MainPage,
+      path: '/main', component: MainPage,
       children: [
-        {
-          path: 'votes',
-          name: 'VoteList',
-          component: VoteListView,
-        },
-        {
-          path: 'votes/:id',
-          name: 'VoteDetail',
-          component: VoteDetailView,
-          props: true,
-        },
-        {
-          path: 'profile',
-          name: 'profile',
-          component: ProfileView
-        },
-        {
-          path: 'playground',
-          name: 'Playground',
-          component: PlaygroundView,
-        }
+        { path: '', redirect: '/main/votes' },
+        { path: 'votes', name: 'VoteList', component: VoteListView, },
+        { path: 'votes/:id', name: 'VoteDetail', component: VoteDetailView, props: true, }
+      ]
+    },
+    {
+      path: '/profile', name: 'Profile', component: ProfileView
+    },
+    {
+      path: '/playground', component: PlaygroundView,
+      children: [
+        { path: '', name: 'PlaygroundHome', component: () => import('@/components/playground/PlaygroundHome.vue') },
+        { path: 'christmasTree', name: 'ChristmasTree', component: () => import('@/components/playground/ChristmasTree.vue') },
+        { path: 'christmasTree2', name: 'ChristmasTree2', component: () => import('@/components/playground/ChristmasTree2.vue') },
+        { path: 'numberGuess', name: 'NumberGuess', component: () => import('@/components/playground/NumberGuessGame.vue') },
+        { path: 'clickSpeed', name: 'ClickSpeed', component: () => import('@/components/playground/ClickSpeedGame.vue') }
       ]
     }
   ]

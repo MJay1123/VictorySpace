@@ -1,5 +1,6 @@
 package com.victoryspace.vics.member.query.controller;
 
+import com.victoryspace.vics.member.query.dto.MemberInfoDTO;
 import com.victoryspace.vics.member.query.dto.MemberQueryDTO;
 import com.victoryspace.vics.member.query.service.MemberQueryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,26 +18,24 @@ public class MemberQueryController {
         this.memberQueryService = memberQueryService;
     }
     @GetMapping
-    public List<MemberQueryDTO> findAll(){
-        List<MemberQueryDTO> list = memberQueryService.findAll();
-        return list;
+    public List<MemberInfoDTO> findAll(){
+        return memberQueryService.findAll();
     }
     @GetMapping("/{id}")
-    public MemberQueryDTO findById(@PathVariable("id") int id){
-        MemberQueryDTO memberQueryDTO = memberQueryService.findById(id);
-        return memberQueryDTO;
+    public MemberInfoDTO findById(@PathVariable("id") int id){
+        return memberQueryService.findById(id);
     }
     @GetMapping("/nickname")
-    public List<MemberQueryDTO> findByNickname(@RequestParam String nickname){
+    public List<MemberInfoDTO> findByNickname(@RequestParam String nickname){
         return memberQueryService.findByNickname(nickname);
     }
     @GetMapping("/email")
-    public MemberQueryDTO findByEmail(@RequestParam String email){
+    public MemberInfoDTO findByEmail(@RequestParam String email){
         return memberQueryService.findByEmail(email);
     }
 
     @GetMapping("/order")
-    public List<MemberQueryDTO> order(@RequestParam String orderBy, @RequestParam String direction){
+    public List<MemberInfoDTO> order(@RequestParam String orderBy, @RequestParam String direction){
         return memberQueryService.order(orderBy, direction);
     }
 }

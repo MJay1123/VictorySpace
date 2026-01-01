@@ -35,4 +35,9 @@ public class LikesQueryServiceImpl implements LikesQueryService {
         List<LikesQueryDTO> dtoList = mapper.findByMemberId(memberId);
         return dtoList;
     }
+
+    @Override
+    public LikesQueryDTO findByVoteIdAndMemberId(int voteId, int memberId) {
+        return mapper.findByVoteIdAndMemberId(voteId, memberId);
+    }
 }

@@ -1,14 +1,10 @@
-package com.victoryspace.vics.vote.query.dto;
+package com.victoryspace.vics.vote.query.dto.request;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
-@Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class VoteSearchDTO {
     private String title;
     private Integer categoryId;

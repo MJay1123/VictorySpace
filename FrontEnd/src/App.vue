@@ -12,10 +12,14 @@ import Header from './components/Header.vue'
 
 const route = useRoute()
 
-// 메인 페이지와 프로필 페이지에서만 Header 표시
 const showHeader = computed(() => {
-  return route.path.startsWith('/main')
+  return (
+    route.path.startsWith('/main') ||
+    route.path.startsWith('/profile') ||
+    route.path.startsWith('/playground')
+  )
 })
+
 </script>
 
 <style>
@@ -33,4 +37,3 @@ body {
   min-height: 100vh;
 }
 </style>
-

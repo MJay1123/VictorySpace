@@ -1,7 +1,11 @@
 package com.victoryspace.vics.vote.query.service;
 
-import com.victoryspace.vics.vote.query.dto.VoteQueryDTO;
-import com.victoryspace.vics.vote.query.dto.VoteSearchDTO;
+import com.victoryspace.vics.common.error.ErrorCode;
+import com.victoryspace.vics.vote.exception.VoteException;
+import com.victoryspace.vics.vote.query.dto.response.VoteQueryCountDTO;
+import com.victoryspace.vics.vote.query.dto.response.VoteQueryDetailResponseDTO;
+import com.victoryspace.vics.vote.query.dto.request.VoteSearchDTO;
+import com.victoryspace.vics.vote.query.dto.response.VoteQueryListResponseDTO;
 import com.victoryspace.vics.vote.query.mapper.VoteQueryMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,36 +18,57 @@ public class VoteQueryServiceImpl implements VoteQueryService {
     private final VoteQueryMapper mapper;
 
     @Override
-    public List<VoteQueryDTO> findAll(){
-        List<VoteQueryDTO> dtoList = mapper.findAll();
+    public List<VoteQueryListResponseDTO> findAll(){
+        List<VoteQueryListResponseDTO> dtoList = mapper.findAll();
         return dtoList;
     }
 
     @Override
-    public VoteQueryDTO findById(int id) {
-        VoteQueryDTO memberQueryDTO = mapper.findById(id);
-        return memberQueryDTO;
+    public VoteQueryDetailResponseDTO findById(int id) {
+        VoteQueryDetailResponseDTO detailDTO = mapper.findById(id);
+        if(detailDTO == null) {
+            throw new VoteException(ErrorCode.VOTE_NOT_FOUND);
+        }
+
+//        VoteQueryCountDTO countDTO = mapper.findVoteCounts(id);
+
+        return VoteQueryDetailResponseDTO.builder()
+                .id(detailDTO.getId())
+                .title(detailDTO.getTitle())
+                .categoryName(detailDTO.getCategoryName())
+                .memberNickname(detailDTO.getMemberNickname())
+                .content(detailDTO.getContent())
+                .challengerNickname(detailDTO.getChallengerNickname())
+                .challengerContent(detailDTO.getChallengerContent())
+                .createdAt(detailDTO.getCreatedAt())
+                .updatedAt(detailDTO.getUpdatedAt())
+                .duration(detailDTO.getDuration())
+                .endedAt(detailDTO.getEndedAt())
+                .homeCount(detailDTO.getHomeCount())
+                .awayCount(detailDTO.getAwayCount())
+                .neutralCount(detailDTO.getNeutralCount())
+                .build();
     }
 
     @Override
-    public List<VoteQueryDTO> search(VoteSearchDTO voteSearchDTO) {
+    public List<VoteQueryListResponseDTO> search(VoteSearchDTO voteSearchDTO) {
         String title = voteSearchDTO.getTitle();
         Integer categoryId = voteSearchDTO.getCategoryId();
         String nickname = voteSearchDTO.getNickname();
         String content = voteSearchDTO.getContent();
-        List<VoteQueryDTO> dtoList = mapper.search(title, categoryId, nickname, content);
+        List<VoteQueryListResponseDTO> dtoList = mapper.search(title, categoryId, nickname, content);
         return dtoList;
     }
 
     @Override
-    public List<VoteQueryDTO> findByMemberId(int memberId) {
-        List<VoteQueryDTO> dtoList = mapper.findByMemberId(memberId);
+    public List<VoteQueryListResponseDTO> findByMemberId(int memberId) {
+        List<VoteQueryListResponseDTO> dtoList = mapper.findByMemberId(memberId);
         return dtoList;
     }
 
     @Override
-    public List<VoteQueryDTO> findByChallengerId(int challengerId) {
-        List<VoteQueryDTO> dtoList = mapper.findByChallengerId(challengerId);
+    public List<VoteQueryListResponseDTO> findByChallengerId(int challengerId) {
+        List<VoteQueryListResponseDTO> dtoList = mapper.findByChallengerId(challengerId);
         return dtoList;
     }
 }

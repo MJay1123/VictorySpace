@@ -1,18 +1,12 @@
 package com.victoryspace.vics.likes.command.domain.aggregate;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "likes")
 public class LikesEntity {
     @Id
@@ -28,4 +22,12 @@ public class LikesEntity {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    public static LikesEntity create(Integer voteId, Integer memberId) {
+        LikesEntity entity = new LikesEntity();
+        entity.voteId = voteId;
+        entity.memberId = memberId;
+        entity.createdAt = LocalDateTime.now();
+        return entity;
+    }
 }

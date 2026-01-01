@@ -1,5 +1,6 @@
 package com.victoryspace.vics.member.query.service;
 
+import com.victoryspace.vics.member.query.dto.MemberInfoDTO;
 import com.victoryspace.vics.member.query.dto.MemberQueryDTO;
 import com.victoryspace.vics.member.query.mapper.MemberQueryMapper;
 import lombok.RequiredArgsConstructor;
@@ -13,33 +14,33 @@ public class MemberQueryServiceImpl implements MemberQueryService {
     private final MemberQueryMapper mapper;
 
     @Override
-    public List<MemberQueryDTO> findAll(){
-        List<MemberQueryDTO> dtoList = mapper.findAll();
+    public List<MemberInfoDTO> findAll(){
+        List<MemberInfoDTO> dtoList = mapper.findAll();
         return dtoList;
     }
 
     @Override
-    public MemberQueryDTO findById(int id) {
-        MemberQueryDTO memberQueryDTO = mapper.findById(id);
+    public MemberInfoDTO findById(int id) {
+        MemberInfoDTO memberQueryDTO = mapper.findById(id);
         return memberQueryDTO;
     }
 
     @Override
-    public List<MemberQueryDTO> findByNickname(String nickname) {
-        List<MemberQueryDTO> dtoList = mapper.findByNickname(nickname);
+    public List<MemberInfoDTO> findByNickname(String nickname) {
+        List<MemberInfoDTO> dtoList = mapper.findByNickname(nickname);
         return dtoList;
     }
 
     @Override
-    public MemberQueryDTO findByEmail(String email) {
-        MemberQueryDTO dto = mapper.findByEmail(email);
+    public MemberInfoDTO findByEmail(String email) {
+        MemberInfoDTO dto = mapper.findByEmail(email);
         return dto;
     }
 
     @Override
-    public List<MemberQueryDTO> order(String orderBy, String direction) {
+    public List<MemberInfoDTO> order(String orderBy, String direction) {
         if(orderBy.equals("point")) {
-            List<MemberQueryDTO> dtoList = mapper.orderByPoint(direction);
+            List<MemberInfoDTO> dtoList = mapper.orderByPoint(direction);
             return dtoList;
         }
         return null;

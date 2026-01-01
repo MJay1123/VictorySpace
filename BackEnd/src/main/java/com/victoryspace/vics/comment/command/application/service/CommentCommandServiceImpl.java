@@ -1,9 +1,16 @@
 package com.victoryspace.vics.comment.command.application.service;
 
 import com.victoryspace.vics.comment.command.application.dto.CommentCommandDTO;
+import com.victoryspace.vics.comment.command.application.dto.request.CommentCreateRequestDTO;
+import com.victoryspace.vics.comment.command.application.dto.request.CommentUpdateRequestDTO;
+import com.victoryspace.vics.comment.command.application.dto.response.CommentCreateResponseDTO;
+import com.victoryspace.vics.comment.command.application.dto.response.CommentDeleteResponseDTO;
+import com.victoryspace.vics.comment.command.application.dto.response.CommentUpdateResponseDTO;
 import com.victoryspace.vics.comment.command.application.mapper.CommentCommandMapper;
 import com.victoryspace.vics.comment.command.domain.aggregate.CommentEntity;
 import com.victoryspace.vics.comment.command.domain.repository.CommentRepository;
+import com.victoryspace.vics.comment.exception.CommentException;
+import com.victoryspace.vics.common.error.ErrorCode;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,33 +24,28 @@ public class CommentCommandServiceImpl implements CommentCommandService {
     private final CommentCommandMapper mapper;
 
     @Override
-    public CommentCommandDTO createComment(CommentCommandDTO dto) {
-        CommentEntity entity = new CommentEntity();
-        entity.setVoteId(dto.getVoteId());
-        entity.setMemberId(dto.getMemberId());
-        entity.setContent(dto.getContent());
-        entity.setCreatedAt(LocalDateTime.now());
-        CommentEntity createdEntity = repository.save(entity);
-        return mapper.toDto(createdEntity);
+    public CommentCreateResponseDTO createComment(CommentCreateRequestDTO requestDTO) {
+        CommentEntity entity = CommentEntity.create(
+                requestDTO.getVoteId(),
+                requestDTO.getMemberId(),
+                requestDTO.getContent()
+        );
+        return mapper.toCreateResponseDto(repository.save(entity));
     }
 
     @Override
-    public CommentCommandDTO updateComment(Integer id, CommentCommandDTO dto) {
+    public CommentUpdateResponseDTO updateComment(Integer id, CommentUpdateRequestDTO requestDTO) {
         CommentEntity entity = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Comment not found"));
-        entity.setContent(dto.getContent());
-        entity.setUpdatedAt(LocalDateTime.now());
-        CommentEntity updatedMemberEntity = repository.save(entity);
-        return mapper.toDto(updatedMemberEntity);
+                .orElseThrow(() -> new CommentException(ErrorCode.COMMENT_NOT_FOUND));
+        entity.update(requestDTO.getContent());
+        return mapper.toUpdateResponseDto(repository.save(entity));
     }
 
     @Override
-    public CommentCommandDTO deleteComment(Integer id) {
+    public CommentDeleteResponseDTO deleteComment(Integer id) {
         CommentEntity entity = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Comment not found"));
-        entity.setUpdatedAt(LocalDateTime.now());
-        entity.setDeletedAt(LocalDateTime.now());
-        CommentEntity deletedEntity = repository.save(entity);
-        return mapper.toDto(deletedEntity);
+                .orElseThrow(() -> new CommentException(ErrorCode.COMMENT_NOT_FOUND));
+        entity.delete();
+        return mapper.toDeleteResponseDto(repository.save(entity));
     }
 }

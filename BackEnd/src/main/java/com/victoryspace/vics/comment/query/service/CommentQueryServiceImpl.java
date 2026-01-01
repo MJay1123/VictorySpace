@@ -1,6 +1,9 @@
 package com.victoryspace.vics.comment.query.service;
 
+import com.victoryspace.vics.auth.SecurityUtil;
 import com.victoryspace.vics.comment.query.dto.CommentQueryDTO;
+import com.victoryspace.vics.comment.query.dto.response.VoteCommentDTO;
+import com.victoryspace.vics.comment.query.dto.response.VoteCommentResponseDTO;
 import com.victoryspace.vics.comment.query.mapper.CommentQueryMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,9 +28,19 @@ public class CommentQueryServiceImpl implements CommentQueryService {
     }
 
     @Override
-    public List<CommentQueryDTO> findByVoteId(int voteId) {
-        List<CommentQueryDTO> dtoList = mapper.findByVoteId(voteId);
-        return dtoList;
+    public List<VoteCommentResponseDTO> findByVoteId(int voteId) {
+        Integer memberId = SecurityUtil.getCurrentMemberId();
+        List<VoteCommentDTO> dtoList = mapper.findByVoteId(voteId);
+        return dtoList.stream()
+                .map(c -> VoteCommentResponseDTO.builder()
+                        .id(c.getId())
+                        .memberNickname(c.getMemberNickname())
+                        .content(c.getContent())
+                        .createdAt(c.getCreatedAt())
+                        .updatedAt(c.getUpdatedAt())
+                        .canEdit(c.getMemberId().equals(memberId))
+                        .build()
+                ).toList();
     }
 
     @Override

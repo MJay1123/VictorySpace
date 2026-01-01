@@ -14,4 +14,6 @@ public interface LikesQueryMapper {
     List<LikesQueryDTO> findByVoteId(int voteId);
 
     List<LikesQueryDTO> findByMemberId(int memberId);
+
+    LikesQueryDTO findByVoteIdAndMemberId(int voteId, int memberId);
 }

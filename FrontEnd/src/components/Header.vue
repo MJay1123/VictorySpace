@@ -30,11 +30,11 @@ const goHome = () => {
 }
 
 const goProfile = () => {
-  router.push('/main/profile')
+  router.push('/profile')
 }
 
 const goPlayground = () => {
-  router.push('/main/playground')
+  router.push('/playground')
 }
 
 const showLogoutModal = ref(false)

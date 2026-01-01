@@ -1,4 +1,4 @@
-package com.victoryspace.vics.config;
+package com.victoryspace.vics.common.config;
 
 import com.victoryspace.vics.auth.JwtFilter;
 import com.victoryspace.vics.auth.JwtUtil;

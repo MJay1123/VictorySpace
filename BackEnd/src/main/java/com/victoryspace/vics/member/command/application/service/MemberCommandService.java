@@ -1,11 +1,12 @@
 package com.victoryspace.vics.member.command.application.service;
 
-import com.victoryspace.vics.member.command.application.dto.MemberCommandDTO;
+import com.victoryspace.vics.member.command.application.dto.request.MemberUpdateRequestDTO;
+import com.victoryspace.vics.member.command.application.dto.response.MemberDeleteResponseDTO;
+import com.victoryspace.vics.member.command.application.dto.response.MemberUpdateResponseDTO;
 
 public interface MemberCommandService {
-    MemberCommandDTO createMember(MemberCommandDTO memberCommandDTO);
 
-    MemberCommandDTO updateMember(Integer id, MemberCommandDTO memberCommandDTO);
+    MemberUpdateResponseDTO updateMember(Integer id, MemberUpdateRequestDTO requestDTO);
 
-    MemberCommandDTO deleteMember(Integer id);
+    MemberDeleteResponseDTO deleteMember(Integer id);
 }

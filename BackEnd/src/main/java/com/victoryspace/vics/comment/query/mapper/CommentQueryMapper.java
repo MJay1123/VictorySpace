@@ -1,6 +1,7 @@
 package com.victoryspace.vics.comment.query.mapper;
 
 import com.victoryspace.vics.comment.query.dto.CommentQueryDTO;
+import com.victoryspace.vics.comment.query.dto.response.VoteCommentDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -11,7 +12,7 @@ public interface CommentQueryMapper {
 
     CommentQueryDTO findById(int id);
 
-    List<CommentQueryDTO> findByVoteId(int voteId);
+    List<VoteCommentDTO> findByVoteId(int voteId);
 
     List<CommentQueryDTO> findByMemberId(int memberId);
 }

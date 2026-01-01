@@ -1,5 +1,6 @@
 package com.victoryspace.vics.comment.command.domain.aggregate;
 
+import com.victoryspace.vics.comment.command.application.dto.request.CommentUpdateRequestDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,4 +38,23 @@ public class CommentEntity {
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
+    public static CommentEntity create(Integer voteId, Integer memberId, String content) {
+        CommentEntity comment = new CommentEntity();
+        comment.setVoteId(voteId);
+        comment.setMemberId(memberId);
+        comment.setContent(content);
+        comment.setCreatedAt(LocalDateTime.now());
+        return comment;
+    }
+
+    public void update(String content) {
+        this.content = content;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void delete() {
+        this.updatedAt = LocalDateTime.now();
+        this.deletedAt = LocalDateTime.now();
+    }
 }

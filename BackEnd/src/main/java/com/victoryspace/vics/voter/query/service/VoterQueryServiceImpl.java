@@ -1,7 +1,7 @@
 package com.victoryspace.vics.voter.query.service;
 
 import com.victoryspace.vics.voter.query.dto.VoterQueryDTO;
-import com.victoryspace.vics.voter.query.dto.VoterSearchDTO;
+import com.victoryspace.vics.voter.query.dto.response.VoterListDTO;
 import com.victoryspace.vics.voter.query.mapper.VoterQueryMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,8 +26,8 @@ public class VoterQueryServiceImpl implements VoterQueryService {
     }
 
     @Override
-    public List<VoterQueryDTO> findByVoteId(int voteId) {
-        List<VoterQueryDTO> dtoList = mapper.findByVoteId(voteId);
+    public List<VoterListDTO> findByVoteId(int voteId) {
+        List<VoterListDTO> dtoList = mapper.findByVoteId(voteId);
         return dtoList;
     }
 
