@@ -1,6 +1,7 @@
 package com.victoryspace.vics.voter.query.mapper;
 
 import com.victoryspace.vics.voter.query.dto.VoterQueryDTO;
+import com.victoryspace.vics.voter.query.dto.response.VoterListDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -11,7 +12,7 @@ public interface VoterQueryMapper {
 
     VoterQueryDTO findById(int id);
 
-    List<VoterQueryDTO> findByVoteId(int voteId);
+    List<VoterListDTO> findByVoteId(int voteId);
 
     List<VoterQueryDTO> findByMemberId(int memberId);
 

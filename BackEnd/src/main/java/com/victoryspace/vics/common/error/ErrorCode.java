@@ -25,6 +25,7 @@ public enum ErrorCode {
 
     // Voter
     ALREADY_VOTED(HttpStatus.BAD_REQUEST, "VOTER-001",  "이미 투표에 참여했습니다."),
+    VOTER_NOT_FOUND(HttpStatus.NOT_FOUND, "VOTER-002", "존재하지 않는 투표자입니다."),
 
     // Comment
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "COMMENT-001", "존재하지 않는 댓글입니다.")

@@ -2,6 +2,7 @@ package com.victoryspace.vics.voter.query.controller;
 
 import com.victoryspace.vics.voter.query.dto.VoterQueryDTO;
 import com.victoryspace.vics.voter.query.dto.VoterSearchDTO;
+import com.victoryspace.vics.voter.query.dto.response.VoterListDTO;
 import com.victoryspace.vics.voter.query.service.VoterQueryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -29,8 +30,8 @@ public class VoterQueryController {
     }
 
     @GetMapping("/vote/{voteId}")
-    public List<VoterQueryDTO> findByVoteId(@PathVariable("voteId") int voteId){
-        List<VoterQueryDTO> dtoList = voterQueryService.findByVoteId(voteId);
+    public List<VoterListDTO> findByVoteId(@PathVariable("voteId") int voteId){
+        List<VoterListDTO> dtoList = voterQueryService.findByVoteId(voteId);
         return dtoList;
     }
 
