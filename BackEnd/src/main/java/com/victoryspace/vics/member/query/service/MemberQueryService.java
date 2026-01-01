@@ -1,18 +1,19 @@
 package com.victoryspace.vics.member.query.service;
 
+import com.victoryspace.vics.member.query.dto.MemberInfoDTO;
 import com.victoryspace.vics.member.query.dto.MemberQueryDTO;
 
 import java.util.List;
 
 public interface MemberQueryService {
 
-    List<MemberQueryDTO> findAll();
+    List<MemberInfoDTO> findAll();
 
-    MemberQueryDTO findById(int id);
+    MemberInfoDTO findById(int id);
 
-    List<MemberQueryDTO> findByNickname(String nickname);
+    List<MemberInfoDTO> findByNickname(String nickname);
 
-    List<MemberQueryDTO> order(String orderBy, String direction);
+    List<MemberInfoDTO> order(String orderBy, String direction);
 
-    MemberQueryDTO findByEmail(String email);
+    MemberInfoDTO findByEmail(String email);
 }

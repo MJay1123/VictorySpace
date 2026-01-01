@@ -59,4 +59,14 @@ public class MemberEntity {
 
     @Column(name = "role")
     private String role;
+
+    public void update(String nickname, String password, String profile) {
+        this.nickname = nickname;
+        this.password = password;
+        this.profile = profile;
+    }
+
+    public void delete() {
+        this.deletedAt = LocalDateTime.now();
+    }
 }

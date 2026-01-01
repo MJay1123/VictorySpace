@@ -22,97 +22,113 @@
         <result property="role" column="role"/>
     </resultMap>
 
-    <select id="findAll" resultMap="MemberResultMap">
-        SELECT id,
-               name,
-               gender,
-               birthday,
-               nickname,
-               password,
-               email,
-               created_at,
-               updated_at,
-               deleted_at,
-               grade_id,
-               profile,
-               point,
-               role
-        FROM member
+    <resultMap id="MemberInfo"
+               type="com.victoryspace.vics.member.query.dto.MemberInfoDTO">
+        <result property="name" column="name"/>
+        <result property="gender" column="gender"/>
+        <result property="birthday" column="birthday"/>
+        <result property="nickname" column="nickname"/>
+        <result property="email" column="email"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="gradeName" column="grade_name"/>
+        <result property="gradeSymbol" column="grade_symbol"/>
+        <result property="profile" column="profile"/>
+        <result property="point" column="point"/>
+        <result property="role" column="role"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="MemberInfo">
+        SELECT m.name,
+               m.gender,
+               m.birthday,
+               m.nickname,
+               m.email,
+               m.created_at,
+               m.updated_at,
+               g.name as grade_name,
+               g.symbol as grade_symbol,
+               m.profile,
+               m.point,
+               m.role
+        FROM member m
+        JOIN grade g ON m.grade_id = g.id
+        WHERE m.deleted_at IS NULL
     </select>
 
-    <select id="findById" resultMap="MemberResultMap">
-        SELECT id,
-               name,
-               gender,
-               birthday,
-               nickname,
-               password,
-               email,
-               created_at,
-               updated_at,
-               deleted_at,
-               grade_id,
-               profile,
-               point,
-               role
-        FROM member
-        WHERE id = #{id}
+    <select id="findById" resultMap="MemberInfo">
+        SELECT m.name,
+               m.gender,
+               m.birthday,
+               m.nickname,
+               m.email,
+               m.created_at,
+               m.updated_at,
+               g.name as grade_name,
+               g.symbol as grade_symbol,
+               m.profile,
+               m.point,
+               m.role
+        FROM member m
+        JOIN grade g ON m.grade_id = g.id
+        WHERE m.deleted_at IS NULL
+        AND m.id = #{id}
     </select>
 
-    <select id="findByNickname" resultMap="MemberResultMap">
-        SELECT id,
-               name,
-               gender,
-               birthday,
-               nickname,
-               password,
-               email,
-               created_at,
-               updated_at,
-               deleted_at,
-               grade_id,
-               profile,
-               point,
-               role
-        FROM member
-        WHERE nickname LIKE CONCAT('%', #{nickname}, '%')
+    <select id="findByNickname" resultMap="MemberInfo">
+        SELECT m.name,
+               m.gender,
+               m.birthday,
+               m.nickname,
+               m.email,
+               m.created_at,
+               m.updated_at,
+               g.name as grade_name,
+               g.symbol as grade_symbol,
+               m.profile,
+               m.point,
+               m.role
+        FROM member m
+        JOIN grade g ON m.grade_id = g.id
+        WHERE m.deleted_at IS NULL
+        AND m.nickname LIKE CONCAT('%', #{nickname}, '%')
     </select>
 
-    <select id="findByEmail" resultMap="MemberResultMap">
-        SELECT id,
-               name,
-               gender,
-               birthday,
-               nickname,
-               password,
-               email,
-               created_at,
-               updated_at,
-               deleted_at,
-               grade_id,
-               profile,
-               point,
-               role
-        FROM member
-        WHERE email = #{email}
+    <select id="findByEmail" resultMap="MemberInfo">
+        SELECT m.name,
+               m.gender,
+               m.birthday,
+               m.nickname,
+               m.email,
+               m.created_at,
+               m.updated_at,
+               g.name as grade_name,
+               g.symbol as grade_symbol,
+               m.profile,
+               m.point,
+               m.role
+        FROM member m
+        JOIN grade g ON m.grade_id = g.id
+        WHERE m.deleted_at IS NULL
+        AND email = #{email}
     </select>
 
-    <select id="orderByPoint" resultMap="MemberResultMap">
-        SELECT id,
-        name,
-        gender,
-        birthday,
-        nickname,
-        password,
-        email,
-        created_at,
-        updated_at,
-        deleted_at,
-        grade_id,
-        profile,
-        point,
-        role
-        FROM member
+    <select id="orderByPoint" resultMap="MemberInfo">
+        SELECT m.name,
+        m.gender,
+        m.birthday,
+        m.nickname,
+        m.email,
+        m.created_at,
+        m.updated_at,
+        g.name as grade_name,
+        g.symbol as grade_symbol,
+        m.profile,
+        m.point,
+        m.role
+        FROM member m
+        JOIN grade g ON m.grade_id = g.id
+        WHERE m.deleted_at IS NULL
         <choose>
             <when test="direction == 'asc'">
                 ORDER BY point ASC

@@ -1,6 +1,9 @@
 package com.victoryspace.vics.member.command.application.controller;
 
 import com.victoryspace.vics.member.command.application.dto.MemberCommandDTO;
+import com.victoryspace.vics.member.command.application.dto.request.MemberUpdateRequestDTO;
+import com.victoryspace.vics.member.command.application.dto.response.MemberDeleteResponseDTO;
+import com.victoryspace.vics.member.command.application.dto.response.MemberUpdateReponseDTO;
 import com.victoryspace.vics.member.command.application.service.MemberCommandService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -15,21 +18,13 @@ public class MemberCommandController {
         this.memberCommandService = memberCommandService;
     }
 
-    @PostMapping
-    public MemberCommandDTO createMember(@RequestBody MemberCommandDTO memberCommandDTO) {
-        MemberCommandDTO createdMemberCommandDTO = memberCommandService.createMember(memberCommandDTO);
-        return createdMemberCommandDTO;
-    }
-
     @PatchMapping("/{id}")
-    public MemberCommandDTO updateMember(@PathVariable Integer id, @RequestBody MemberCommandDTO memberCommandDTO) {
-        MemberCommandDTO updatedMemberCommandDTO = memberCommandService.updateMember(id, memberCommandDTO);
-        return updatedMemberCommandDTO;
+    public MemberUpdateReponseDTO updateMember(@PathVariable Integer id, @RequestBody MemberUpdateRequestDTO requestDTO) {
+        return memberCommandService.updateMember(id, requestDTO);
     }
 
     @DeleteMapping("/{id}")
-    public MemberCommandDTO deleteMember(@PathVariable Integer id) {
-        MemberCommandDTO deletedMemberCommandDTO = memberCommandService.deleteMember(id);
-        return deletedMemberCommandDTO;
+    public MemberDeleteResponseDTO deleteMember(@PathVariable Integer id) {
+        return memberCommandService.deleteMember(id);
     }
 }

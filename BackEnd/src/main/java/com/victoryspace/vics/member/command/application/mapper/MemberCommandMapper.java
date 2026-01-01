@@ -1,6 +1,8 @@
 package com.victoryspace.vics.member.command.application.mapper;
 
 import com.victoryspace.vics.member.command.application.dto.MemberCommandDTO;
+import com.victoryspace.vics.member.command.application.dto.response.MemberDeleteResponseDTO;
+import com.victoryspace.vics.member.command.application.dto.response.MemberUpdateReponseDTO;
 import com.victoryspace.vics.member.command.domain.aggregate.MemberEntity;
 import org.springframework.stereotype.Component;
 
@@ -23,5 +25,21 @@ public class MemberCommandMapper {
         dto.setPoint(entity.getPoint());
         dto.setRole(entity.getRole());
         return dto;
+    }
+
+    public MemberUpdateReponseDTO toUpdateReponseDTO(MemberEntity entity) {
+        return MemberUpdateReponseDTO.builder()
+                .id(entity.getId())
+                .nickname(entity.getNickname())
+                .profile(entity.getProfile())
+                .updatedAt(entity.getUpdatedAt())
+                .build();
+    }
+
+    public MemberDeleteResponseDTO toDeleteResponseDTO(MemberEntity entity) {
+        return MemberDeleteResponseDTO.builder()
+                .id(entity.getId())
+                .deletedAt(entity.getDeletedAt())
+                .build();
     }
 }
