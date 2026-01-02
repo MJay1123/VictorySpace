@@ -151,17 +151,16 @@ const isLiked = ref(false)
 const showLikesModal = ref(false)
 const myLike = ref(null)
 const user = ref(null)
+const userId = JSON.parse(localStorage.getItem('userInfo')).id
 const canEdit = computed(() =>
-    user.value &&
-    user.value.id === vote.value.memberId &&
-    !vote.value.challengerId
+    userId === vote.value.memberId && !vote.value.challengerNickname
 )
 
 const fetchUser = async () => {
     try {
-        const userId = JSON.parse(localStorage.getItem('userInfo')).id
         const res = await memberApi.findById(userId)
         user.value = res.data
+        console.log('user.value:', user.value)
     } catch {
         console.log("유저 정보 로딩 실패")
         user.value = null
@@ -174,7 +173,6 @@ const fetchVote = async () => {
 
     if (user.value) {
         try {
-            const userId = JSON.parse(localStorage.getItem('userInfo')).id
             const uv = await voterApi.findByVoteAndMemberId(props.voteId, userId)
             userVote.value = uv.data
             selectedOption.value = uv.data?.content || null
@@ -195,7 +193,6 @@ const fetchLikes = async () => {
 
 const fetchMyLike = async () => {
     try {
-        const userId = JSON.parse(localStorage.getItem('userInfo')).id
         const res = await likesApi.findByMemberId(userId)
 
         myLike.value = res.data.find(
@@ -210,7 +207,6 @@ const fetchMyLike = async () => {
 
 const toggleLike = async () => {
     try {
-        const userId = JSON.parse(localStorage.getItem('userInfo')).id
         if (!isLiked.value) {
             // 👍 좋아요 추가
             const likesDTO = {
@@ -246,7 +242,6 @@ const refresh = async () => {
 }
 
 const handleVote = async content => {
-    const userId = JSON.parse(localStorage.getItem('userInfo')).id
     await voterApi.createVoter({
         voteId: props.voteId,
         memberId: userId,
@@ -265,9 +260,8 @@ const challengeVote = async () => {
         alert('도전자 내용을 입력해주세요')
         return
     }
-
     await voteApi.challengeVote(vote.value.id, {
-        challengerId: user.value.id,
+        challengerId: userId,
         challengerContent: challengerContent.value
     })
 
