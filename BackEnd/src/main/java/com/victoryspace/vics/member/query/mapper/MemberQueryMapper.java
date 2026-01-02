@@ -1,6 +1,7 @@
 package com.victoryspace.vics.member.query.mapper;
 
 import com.victoryspace.vics.member.query.dto.MemberInfoDTO;
+import com.victoryspace.vics.member.query.dto.MemberPointRankListDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -16,4 +17,6 @@ public interface MemberQueryMapper {
     MemberInfoDTO findByEmail(String email);
 
     List<MemberInfoDTO> orderByPoint(String direction);
+
+    List<MemberPointRankListDTO> orderRank();
 }
