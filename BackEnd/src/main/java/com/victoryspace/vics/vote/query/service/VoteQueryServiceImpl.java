@@ -29,23 +29,7 @@ public class VoteQueryServiceImpl implements VoteQueryService {
         if(detailDTO == null) {
             throw new VoteException(ErrorCode.VOTE_NOT_FOUND);
         }
-
-        return VoteQueryDetailResponseDTO.builder()
-                .id(detailDTO.getId())
-                .title(detailDTO.getTitle())
-                .categoryName(detailDTO.getCategoryName())
-                .memberNickname(detailDTO.getMemberNickname())
-                .content(detailDTO.getContent())
-                .challengerNickname(detailDTO.getChallengerNickname())
-                .challengerContent(detailDTO.getChallengerContent())
-                .createdAt(detailDTO.getCreatedAt())
-                .updatedAt(detailDTO.getUpdatedAt())
-                .duration(detailDTO.getDuration())
-                .endedAt(detailDTO.getEndedAt())
-                .homeCount(detailDTO.getHomeCount())
-                .awayCount(detailDTO.getAwayCount())
-                .neutralCount(detailDTO.getNeutralCount())
-                .build();
+        return detailDTO;
     }
 
     @Override
