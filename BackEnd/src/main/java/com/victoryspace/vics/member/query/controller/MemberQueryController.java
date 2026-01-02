@@ -1,6 +1,7 @@
 package com.victoryspace.vics.member.query.controller;
 
 import com.victoryspace.vics.member.query.dto.MemberInfoDTO;
+import com.victoryspace.vics.member.query.dto.MemberPointRankListDTO;
 import com.victoryspace.vics.member.query.dto.MemberQueryDTO;
 import com.victoryspace.vics.member.query.service.MemberQueryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,5 +38,9 @@ public class MemberQueryController {
     @GetMapping("/order")
     public List<MemberInfoDTO> order(@RequestParam String orderBy, @RequestParam String direction){
         return memberQueryService.order(orderBy, direction);
+    }
+    @GetMapping("/rank")
+    public List<MemberPointRankListDTO> orderRank(){
+        return memberQueryService.orderRank();
     }
 }

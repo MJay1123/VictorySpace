@@ -1,6 +1,7 @@
 package com.victoryspace.vics.member.query.service;
 
 import com.victoryspace.vics.member.query.dto.MemberInfoDTO;
+import com.victoryspace.vics.member.query.dto.MemberPointRankListDTO;
 import com.victoryspace.vics.member.query.dto.MemberQueryDTO;
 import com.victoryspace.vics.member.query.mapper.MemberQueryMapper;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,11 @@ public class MemberQueryServiceImpl implements MemberQueryService {
     public MemberInfoDTO findByEmail(String email) {
         MemberInfoDTO dto = mapper.findByEmail(email);
         return dto;
+    }
+
+    @Override
+    public List<MemberPointRankListDTO> orderRank() {
+        return mapper.orderRank();
     }
 
     @Override

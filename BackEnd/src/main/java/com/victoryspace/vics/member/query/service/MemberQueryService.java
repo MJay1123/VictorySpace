@@ -1,6 +1,7 @@
 package com.victoryspace.vics.member.query.service;
 
 import com.victoryspace.vics.member.query.dto.MemberInfoDTO;
+import com.victoryspace.vics.member.query.dto.MemberPointRankListDTO;
 import com.victoryspace.vics.member.query.dto.MemberQueryDTO;
 
 import java.util.List;
@@ -16,4 +17,6 @@ public interface MemberQueryService {
     List<MemberInfoDTO> order(String orderBy, String direction);
 
     MemberInfoDTO findByEmail(String email);
+
+    List<MemberPointRankListDTO> orderRank();
 }

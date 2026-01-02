@@ -24,6 +24,7 @@
 
     <resultMap id="MemberInfo"
                type="com.victoryspace.vics.member.query.dto.MemberInfoDTO">
+        <result property="id" column="id"/>
         <result property="name" column="name"/>
         <result property="gender" column="gender"/>
         <result property="birthday" column="birthday"/>
@@ -31,6 +32,7 @@
         <result property="email" column="email"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
+        <result property="gradeId" column="grade_id"/>
         <result property="gradeName" column="grade_name"/>
         <result property="gradeSymbol" column="grade_symbol"/>
         <result property="profile" column="profile"/>
@@ -38,37 +40,55 @@
         <result property="role" column="role"/>
     </resultMap>
 
+    <resultMap id="MemberPointRank"
+               type="com.victoryspace.vics.member.query.dto.MemberPointRankListDTO">
+        <result property="id" column="id"/>
+        <result property="gender" column="gender"/>
+        <result property="nickname" column="nickname"/>
+        <result property="gradeId" column="grade_id"/>
+        <result property="gradeName" column="grade_name"/>
+        <result property="gradeSymbol" column="grade_symbol"/>
+        <result property="profile" column="profile"/>
+        <result property="point" column="point"/>
+    </resultMap>
+
     <select id="findAll" resultMap="MemberInfo">
-        SELECT m.name,
-               m.gender,
-               m.birthday,
-               m.nickname,
-               m.email,
-               m.created_at,
-               m.updated_at,
-               g.name as grade_name,
-               g.symbol as grade_symbol,
-               m.profile,
-               m.point,
-               m.role
+        SELECT
+            m.id,
+            m.name,
+            m.gender,
+            m.birthday,
+            m.nickname,
+            m.email,
+            m.created_at,
+            m.updated_at,
+            m.grade_id,
+            g.name as grade_name,
+            g.symbol as grade_symbol,
+            m.profile,
+            m.point,
+            m.role
         FROM member m
         JOIN grade g ON m.grade_id = g.id
         WHERE m.deleted_at IS NULL
     </select>
 
     <select id="findById" resultMap="MemberInfo">
-        SELECT m.name,
-               m.gender,
-               m.birthday,
-               m.nickname,
-               m.email,
-               m.created_at,
-               m.updated_at,
-               g.name as grade_name,
-               g.symbol as grade_symbol,
-               m.profile,
-               m.point,
-               m.role
+        SELECT
+            m.id,
+            m.name,
+            m.gender,
+            m.birthday,
+            m.nickname,
+            m.email,
+            m.created_at,
+            m.updated_at,
+            m.grade_id,
+            g.name as grade_name,
+            g.symbol as grade_symbol,
+            m.profile,
+            m.point,
+            m.role
         FROM member m
         JOIN grade g ON m.grade_id = g.id
         WHERE m.deleted_at IS NULL
@@ -76,18 +96,21 @@
     </select>
 
     <select id="findByNickname" resultMap="MemberInfo">
-        SELECT m.name,
-               m.gender,
-               m.birthday,
-               m.nickname,
-               m.email,
-               m.created_at,
-               m.updated_at,
-               g.name as grade_name,
-               g.symbol as grade_symbol,
-               m.profile,
-               m.point,
-               m.role
+        SELECT
+            m.id,
+            m.name,
+            m.gender,
+            m.birthday,
+            m.nickname,
+            m.email,
+            m.created_at,
+            m.updated_at,
+            m.grade_id,
+            g.name as grade_name,
+            g.symbol as grade_symbol,
+            m.profile,
+            m.point,
+            m.role
         FROM member m
         JOIN grade g ON m.grade_id = g.id
         WHERE m.deleted_at IS NULL
@@ -95,18 +118,21 @@
     </select>
 
     <select id="findByEmail" resultMap="MemberInfo">
-        SELECT m.name,
-               m.gender,
-               m.birthday,
-               m.nickname,
-               m.email,
-               m.created_at,
-               m.updated_at,
-               g.name as grade_name,
-               g.symbol as grade_symbol,
-               m.profile,
-               m.point,
-               m.role
+        SELECT
+            m.id,
+            m.name,
+            m.gender,
+            m.birthday,
+            m.nickname,
+            m.email,
+            m.created_at,
+            m.updated_at,
+            m.grade_id,
+            g.name as grade_name,
+            g.symbol as grade_symbol,
+            m.profile,
+            m.point,
+            m.role
         FROM member m
         JOIN grade g ON m.grade_id = g.id
         WHERE m.deleted_at IS NULL
@@ -114,13 +140,16 @@
     </select>
 
     <select id="orderByPoint" resultMap="MemberInfo">
-        SELECT m.name,
+        SELECT
+        m.id,
+        m.name,
         m.gender,
         m.birthday,
         m.nickname,
         m.email,
         m.created_at,
         m.updated_at,
+        m.grade_id,
         g.name as grade_name,
         g.symbol as grade_symbol,
         m.profile,
@@ -137,5 +166,21 @@
                 ORDER BY point DESC
             </otherwise>
         </choose>
+    </select>
+
+    <select id="orderRank" resultMap="MemberPointRank">
+        SELECT
+            m.id,
+            m.gender,
+            m.nickname,
+            m.grade_id,
+            g.name as grade_name,
+            g.symbol as grade_symbol,
+            m.profile,
+            m.point
+        FROM member m
+        JOIN grade g ON m.grade_id = g.id
+        WHERE m.deleted_at IS NULL
+        ORDER BY m.point desc
     </select>
 </mapper>
