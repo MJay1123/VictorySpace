@@ -1,6 +1,5 @@
 package com.victoryspace.vics.vote.command.application.mapper;
 
-import com.victoryspace.vics.vote.command.application.dto.VoteCommandDTO;
 import com.victoryspace.vics.vote.command.application.dto.response.VoteChallengeResponseDTO;
 import com.victoryspace.vics.vote.command.application.dto.response.VoteCreateResponseDTO;
 import com.victoryspace.vics.vote.command.application.dto.response.VoteDeleteResponseDTO;

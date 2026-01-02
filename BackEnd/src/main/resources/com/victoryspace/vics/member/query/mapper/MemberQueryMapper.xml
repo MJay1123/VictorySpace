@@ -4,27 +4,10 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.victoryspace.vics.member.query.mapper.MemberQueryMapper">
-    <resultMap id="MemberResultMap"
-               type="com.victoryspace.vics.member.query.dto.MemberQueryDTO">
-        <result property="id" column="id"/>
-        <result property="name" column="name"/>
-        <result property="gender" column="gender"/>
-        <result property="birthday" column="birthday"/>
-        <result property="nickname" column="nickname"/>
-        <result property="password" column="password"/>
-        <result property="email" column="email"/>
-        <result property="createdAt" column="created_at"/>
-        <result property="updatedAt" column="updated_at"/>
-        <result property="deletedAt" column="deleted_at"/>
-        <result property="gradeId" column="grade_id"/>
-        <result property="profile" column="profile"/>
-        <result property="point" column="point"/>
-        <result property="role" column="role"/>
-    </resultMap>
 
     <resultMap id="MemberInfo"
                type="com.victoryspace.vics.member.query.dto.MemberInfoDTO">
-        <result property="id" column="id"/>
+        <id property="id" column="id"/>
         <result property="name" column="name"/>
         <result property="gender" column="gender"/>
         <result property="birthday" column="birthday"/>
@@ -42,7 +25,7 @@
 
     <resultMap id="MemberPointRank"
                type="com.victoryspace.vics.member.query.dto.MemberPointRankListDTO">
-        <result property="id" column="id"/>
+        <id property="id" column="id"/>
         <result property="gender" column="gender"/>
         <result property="nickname" column="nickname"/>
         <result property="gradeId" column="grade_id"/>

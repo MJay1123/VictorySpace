@@ -1,6 +1,5 @@
 package com.victoryspace.vics.vote.command.application.controller;
 
-import com.victoryspace.vics.vote.command.application.dto.VoteCommandDTO;
 import com.victoryspace.vics.vote.command.application.dto.request.VoteChallengeRequestDTO;
 import com.victoryspace.vics.vote.command.application.dto.request.VoteCreateRequestDTO;
 import com.victoryspace.vics.vote.command.application.dto.request.VoteUpdateRequestDTO;

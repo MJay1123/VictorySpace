@@ -4,47 +4,43 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.victoryspace.vics.vote.query.mapper.VoteQueryMapper">
-    <resultMap id="VoteResultMap"
-               type="com.victoryspace.vics.vote.query.dto.VoteQueryDTO">
-        <result property="id" column="id"/>
-        <result property="title" column="title"/>
-        <result property="categoryId" column="category_id"/>
-        <result property="memberId" column="member_id"/>
-        <result property="content" column="content"/>
-        <result property="challengerId" column="challenger_id"/>
-        <result property="challengerContent" column="challenger_content"/>
-        <result property="createdAt" column="created_at"/>
-        <result property="updatedAt" column="updated_at"/>
-        <result property="deletedAt" column="deleted_at"/>
-        <result property="duration" column="duration"/>
-        <result property="endedAt" column="ended_at"/>
-    </resultMap>
 
     <resultMap id="VoteListResponse"
                type="com.victoryspace.vics.vote.query.dto.response.VoteQueryListResponseDTO">
         <id property="id" column="id"/>
         <result property="title" column="title"/>
+        <result property="categoryId" column="category_id"/>
         <result property="categoryName" column="category_name"/>
+        <result property="memberId" column="member_id"/>
         <result property="memberNickname" column="member_nickname"/>
+        <result property="challengerId" column="challenger_id"/>
+        <result property="challengerNickname" column="challenger_nickname"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
         <result property="duration" column="duration"/>
         <result property="endedAt" column="ended_at"/>
+        <result property="likesCount" column="likes_count"/>
+        <result property="commentsCount" column="comments_count"/>
     </resultMap>
 
     <resultMap id="VoteDetailResponse"
                type="com.victoryspace.vics.vote.query.dto.response.VoteQueryDetailResponseDTO">
         <id property="id" column="id"/>
         <result property="title" column="title"/>
+        <result property="categoryId" column="category_id"/>
         <result property="categoryName" column="category_name"/>
+        <result property="memberId" column="member_id"/>
         <result property="memberNickname" column="member_nickname"/>
         <result property="content" column="content"/>
+        <result property="challengerId" column="challenger_id"/>
         <result property="challengerNickname" column="challenger_nickname"/>
         <result property="challengerContent" column="challenger_content"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
         <result property="duration" column="duration"/>
         <result property="endedAt" column="ended_at"/>
+        <result property="likesCount" column="likes_count"/>
+        <result property="commentsCount" column="comments_count"/>
         <result property="homeCount" column="home_count"/>
         <result property="awayCount" column="away_count"/>
         <result property="neutralCount" column="neutral_count"/>
@@ -53,96 +49,193 @@
     <select id="findAll" resultMap="VoteListResponse">
         SELECT v.id,
                v.title,
+               v.category_id,
                c.name as category_name,
+               v.member_id,
                m.nickname as member_nickname,
+               v.challenger_id,
+               ch.nickname as challenger_nickname,
                v.created_at,
                v.updated_at,
                v.duration,
-               v.ended_at
+               v.ended_at,
+               COALESCE(l.likes_count, 0)    AS likes_count,
+               COALESCE(co.comments_count, 0) AS comments_count
         FROM vote v
         JOIN category c ON c.id = v.category_id
         JOIN member m ON m.id = v.member_id
+        LEFT JOIN member ch ON ch.id = v.challenger_id
+        LEFT JOIN (SELECT
+                        vote_id,
+                        COUNT(*) AS likes_count
+                    FROM likes
+                    GROUP BY vote_id
+                    ) l ON l.vote_id = v.id
+        LEFT JOIN (
+                    SELECT vote_id, COUNT(*) AS comments_count
+                    FROM comment
+                    GROUP BY vote_id
+                    ) co ON co.vote_id = v.id
         WHERE v.deleted_at IS NULL
         ORDER BY v.created_at DESC
     </select>
 
     <select id="findById" resultMap="VoteDetailResponse">
-        SELECT
-            v.id,
-            v.title,
-            c.name as category_name,
-            m.nickname as member_nickname,
-            v.content,
-            ch.nickname as challenger_nickname,
-            v.challenger_content,
-            v.created_at,
-            v.updated_at,
-            v.duration,
-            v.ended_at,
-            COALESCE(SUM(CASE WHEN vt.content = 'home' THEN 1 ELSE 0 END), 0) AS home_count,
-            COALESCE(SUM(CASE WHEN vt.content = 'away' THEN 1 ELSE 0 END), 0) AS away_count,
-            COALESCE(SUM(CASE WHEN vt.content = 'neutral' THEN 1 ELSE 0 END), 0) AS neutral_count
+        SELECT v.id,
+               v.title,
+               v.category_id,
+               c.name as category_name,
+               v.member_id,
+               m.nickname as member_nickname,
+               v.content,
+               v.challenger_id,
+               ch.nickname as challenger_nickname,
+               v.challenger_content,
+               v.created_at,
+               v.updated_at,
+               v.duration,
+               v.ended_at,
+               COALESCE(l.likes_count, 0)    AS likes_count,
+               COALESCE(co.comments_count, 0) AS comments_count,
+               COALESCE(vt.home_count, 0)     AS home_count,
+               COALESCE(vt.away_count, 0)     AS away_count,
+               COALESCE(vt.neutral_count, 0)  AS neutral_count
         FROM vote v
         JOIN category c ON v.category_id = c.id
         JOIN member m ON m.id = v.member_id
         LEFT JOIN member ch ON ch.id = v.challenger_id
-        LEFT JOIN voter vt ON v.id = vt.vote_id
+
+        LEFT JOIN (
+            SELECT
+                vote_id,
+                COUNT(*) AS likes_count
+            FROM likes
+            GROUP BY vote_id
+            ) l ON l.vote_id = v.id
+
+        LEFT JOIN (
+            SELECT
+                vote_id,
+                COUNT(*) AS comments_count
+            FROM comment
+            GROUP BY vote_id
+            ) co ON co.vote_id = v.id
+
+        LEFT JOIN (
+            SELECT
+                vote_id,
+                SUM(content = 'home')    AS home_count,
+                SUM(content = 'away')    AS away_count,
+                SUM(content = 'neutral') AS neutral_count
+            FROM voter
+            GROUP BY vote_id
+            ) vt ON vt.vote_id = v.id
+
         WHERE v.id = #{id}
         AND v.deleted_at IS NULL
-        GROUP BY
-            v.id
 
     </select>
 
     <select id="findByMemberId" resultMap="VoteListResponse">
-        SELECT
-            v.id,
-            v.title,
-            c.name as category_name,
-            m.nickname as member_nickname,
-            v.created_at,
-            v.updated_at,
-            v.duration,
-            v.ended_at
+        SELECT v.id,
+               v.title,
+               v.category_id,
+               c.name as category_name,
+               v.member_id,
+               m.nickname as member_nickname,
+               v.challenger_id,
+               ch.nickname as challenger_nickname,
+               v.created_at,
+               v.updated_at,
+               v.duration,
+               v.ended_at,
+               COALESCE(l.likes_count, 0)    AS likes_count,
+               COALESCE(co.comments_count, 0) AS comments_count
         FROM vote v
-        JOIN category c ON c.id = v.category_id
-        JOIN member m ON m.id = v.member_id
-        WHERE v.member_id = #{memberId}
-        AND v.deleted_at IS NULL
+                 JOIN category c ON c.id = v.category_id
+                 JOIN member m ON m.id = v.member_id
+                 LEFT JOIN member ch ON ch.id = v.challenger_id
+                 LEFT JOIN (SELECT
+                                vote_id,
+                                COUNT(*) AS likes_count
+                            FROM likes
+                            GROUP BY vote_id
+        ) l ON l.vote_id = v.id
+                 LEFT JOIN (
+            SELECT vote_id, COUNT(*) AS comments_count
+            FROM comment
+            GROUP BY vote_id
+        ) co ON co.vote_id = v.id
+        WHERE v.deleted_at IS NULL
+        AND v.member_id = #{memberId}
         ORDER BY v.created_at DESC
     </select>
 
     <select id="findByChallengerId" resultMap="VoteListResponse">
-        SELECT
-            v.id,
-            v.title,
-            c.name as category_name,
-            m.nickname as member_nickname,
-            v.created_at,
-            v.updated_at,
-            v.duration,
-            v.ended_at
+        SELECT v.id,
+               v.title,
+               v.category_id,
+               c.name as category_name,
+               v.member_id,
+               m.nickname as member_nickname,
+               v.challenger_id,
+               ch.nickname as challenger_nickname,
+               v.created_at,
+               v.updated_at,
+               v.duration,
+               v.ended_at,
+               COALESCE(l.likes_count, 0)    AS likes_count,
+               COALESCE(co.comments_count, 0) AS comments_count
         FROM vote v
-        JOIN category c ON c.id = v.category_id
-        JOIN member m ON m.id = v.member_id
-        WHERE v.challenger_id = #{challengerId}
-          AND v.deleted_at IS NULL
+                 JOIN category c ON c.id = v.category_id
+                 JOIN member m ON m.id = v.member_id
+                 LEFT JOIN member ch ON ch.id = v.challenger_id
+                 LEFT JOIN (SELECT
+                                vote_id,
+                                COUNT(*) AS likes_count
+                            FROM likes
+                            GROUP BY vote_id
+        ) l ON l.vote_id = v.id
+                 LEFT JOIN (
+            SELECT vote_id, COUNT(*) AS comments_count
+            FROM comment
+            GROUP BY vote_id
+        ) co ON co.vote_id = v.id
+        WHERE v.deleted_at IS NULL
+        AND v.challenger_id = #{challengerId}
         ORDER BY v.created_at DESC
     </select>
 
     <select id="search" resultMap="VoteListResponse">
-        SELECT
-            v.id,
-            v.title,
-            c.name AS category_name,
-            m.nickname AS member_nickname,
-            v.created_at,
-            v.updated_at,
-            v.duration,
-            v.ended_at
+        SELECT v.id,
+        v.title,
+        v.category_id,
+        c.name as category_name,
+        v.member_id,
+        m.nickname as member_nickname,
+        v.challenger_id,
+        ch.nickname as challenger_nickname,
+        v.created_at,
+        v.updated_at,
+        v.duration,
+        v.ended_at,
+        COALESCE(l.likes_count, 0)    AS likes_count,
+        COALESCE(co.comments_count, 0) AS comments_count
         FROM vote v
         JOIN category c ON c.id = v.category_id
         JOIN member m ON m.id = v.member_id
+        LEFT JOIN member ch ON ch.id = v.challenger_id
+        LEFT JOIN (SELECT
+        vote_id,
+        COUNT(*) AS likes_count
+        FROM likes
+        GROUP BY vote_id
+        ) l ON l.vote_id = v.id
+        LEFT JOIN (
+        SELECT vote_id, COUNT(*) AS comments_count
+        FROM comment
+        GROUP BY vote_id
+        ) co ON co.vote_id = v.id
         <where>
             v.deleted_at IS NULL
 
