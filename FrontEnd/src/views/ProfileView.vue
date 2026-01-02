@@ -4,29 +4,39 @@
       <h2 class="page-title">내 정보</h2>
 
       <div class="user-info-card">
+        <div class="profile-header">
+          <img :src="profileImage" class="profile-image" />
+
+          <div class="profile-main">
+            <div class="name-row">
+              <h3 class="user-name">{{ user?.name }}</h3>
+              <span class="grade">
+                {{ user?.gradeSymbol }} {{ user?.gradeName }}
+              </span>
+              <span class="point"> Point :  {{ user?.point }} </span>
+            </div>
+
+            <p class="nickname">@{{ user?.nickname }}</p>
+            <p class="email">{{ user?.email }}</p>
+          </div>
+        </div>
+
         <div class="info-content">
           <div class="info-item">
-            <span class="info-label">이메일:</span>
-            <span class="info-value">{{ user?.email || '없음' }}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">이름:</span>
-            <span class="info-value">{{ user?.name || '없음' }}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">닉네임:</span>
-            <span class="info-value">{{ user?.nickname || '없음' }}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">성별:</span>
+            <span class="info-label">성별</span>
             <span class="info-value">{{ getGenderText(user?.gender) }}</span>
           </div>
           <div class="info-item">
-            <span class="info-label">생년월일:</span>
-            <span class="info-value">{{ user?.birthday || '없음' }}</span>
+            <span class="info-label">생년월일</span>
+            <span class="info-value">{{ user?.birthday }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">가입일</span>
+            <span class="info-value">{{ joinDate }}</span>
           </div>
         </div>
       </div>
+
 
       <!-- 내가 만든 매치업 -->
       <div class="matchup-section">
@@ -34,8 +44,7 @@
         <div v-if="isLoadingCreated" class="loading">로딩 중...</div>
         <div v-else-if="createdVotes.length === 0" class="empty-message">만든 매치업이 없습니다.</div>
         <div v-else class="matchup-list">
-          <div v-for="vote in createdVotes" :key="vote.id" class="matchup-item"
-            @click="goVoteDetail(vote.id)">
+          <div v-for="vote in createdVotes" :key="vote.id" class="matchup-item" @click="goVoteDetail(vote.id)">
             <h4 class="matchup-title">{{ vote.title }}</h4>
             <p class="matchup-preview">{{ truncateContent(vote.content) }}</p>
             <span class="matchup-date">{{ formatDate(vote.createdAt) }}</span>
@@ -49,8 +58,7 @@
         <div v-if="isLoadingChallenged" class="loading">로딩 중...</div>
         <div v-else-if="challengedVotes.length === 0" class="empty-message">참여한 매치업이 없습니다.</div>
         <div v-else class="matchup-list">
-          <div v-for="vote in challengedVotes" :key="vote.id" class="matchup-item"
-            @click="goVoteDetail(vote.id)">
+          <div v-for="vote in challengedVotes" :key="vote.id" class="matchup-item" @click="goVoteDetail(vote.id)">
             <h4 class="matchup-title">{{ vote.title }}</h4>
             <p class="matchup-preview">{{ truncateContent(vote.content) }}</p>
             <span class="matchup-date">{{ formatDate(vote.createdAt) }}</span>
@@ -65,6 +73,8 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import voteApi from '../api/voteApi'
+import memberApi from '../api/memberApi'
+import logo2 from '../assets/images/logo2.png'
 
 const router = useRouter()
 
@@ -79,23 +89,50 @@ const getGenderText = (gender) => {
   return genderMap[gender] || '없음'
 }
 
-const user = computed(() => {
+const userId = computed(() => {
+  const raw = localStorage.getItem('userInfo')
+  if (!raw) return null
+
   try {
-    return JSON.parse(localStorage.getItem('userInfo'))
-  } catch (e){
-    console.log("유저 정보 로딩 실패", e)
+    return JSON.parse(raw)?.id ?? null
+  } catch (e) {
+    console.log('유저id 정보 로딩 실패', e)
     return null
   }
 })
 
+const user = ref(null)
 const createdVotes = ref([])
 const challengedVotes = ref([])
 const isLoadingCreated = ref(false)
 const isLoadingChallenged = ref(false)
 
-const fetchCreatedVotes = async () => {
+const fetchUserInfo = async () => {
+  if (!userId.value) return
+
   try {
-    const res = await voteApi.findByMemberId(user.value.id)
+    const res = await memberApi.findById(userId.value)
+    user.value = res.data
+  } catch (e) {
+    console.error('유저 정보 로딩 실패', e)
+  }
+}
+
+const profileImage = computed(() => {
+  return user.value?.profile || logo2
+})
+
+const joinDate = computed(() => {
+  if (!user.value?.createdAt) return ''
+  return new Date(user.value.createdAt).toLocaleDateString('ko-KR')
+})
+
+const fetchCreatedVotes = async () => {
+  if (!userId.value) return
+
+  isLoadingCreated.value = true
+  try {
+    const res = await voteApi.findByMemberId(userId.value)
     createdVotes.value = res.data
   } catch (e) {
     console.error('내가 생성한 매치업 조회 실패', e)
@@ -105,11 +142,11 @@ const fetchCreatedVotes = async () => {
 }
 
 const fetchChallengedVotes = async () => {
-  if (!user.value?.id) return
-  
+  if (!userId.value) return
+
   isLoadingChallenged.value = true
   try {
-    const res = await voteApi.findByChallengerId(user.value.id)
+    const res = await voteApi.findByChallengerId(userId.value)
     challengedVotes.value = res.data
   } catch (e) {
     console.error('내가 참여한 매치업 조회 실패', e)
@@ -134,6 +171,7 @@ const goVoteDetail = (voteId) => {
 }
 
 onMounted(async () => {
+  await fetchUserInfo()
   await fetchCreatedVotes()
   await fetchChallengedVotes()
 })
@@ -144,6 +182,31 @@ onMounted(async () => {
   min-height: calc(100vh - 80px);
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   padding: 2rem;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.profile-image {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e0e0e0;
+}
+
+.profile-main {
+  flex: 1;
+}
+
+.name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .profile-container {
@@ -166,10 +229,40 @@ onMounted(async () => {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
+.user-name {
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.grade {
+  background: #f1f3f5;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  font-size: 1.2rem;
+}
+
+.point {
+  background: #85c2ff;
+  padding: 0.5rem 0.7rem;
+  border-radius: 999px;
+  font-size: 1.2rem;
+}
+
+.nickname {
+  font-size: 1.2rem;
+  margin: 0.25rem 0;
+  color: #666;
+}
+
+.email {
+  font-size: 1.3rem;
+  color: #888;
+}
+
 .info-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  border-top: 1px solid #eee;
+  padding-top: 1rem;
 }
 
 .info-item {
@@ -192,7 +285,7 @@ onMounted(async () => {
 
 .info-value {
   color: #333;
-  font-size: 1rem;
+  font-size: 1.3rem;
 }
 
 .matchup-section {
@@ -257,5 +350,4 @@ onMounted(async () => {
   font-size: 0.85rem;
   color: #999;
 }
-
 </style>
