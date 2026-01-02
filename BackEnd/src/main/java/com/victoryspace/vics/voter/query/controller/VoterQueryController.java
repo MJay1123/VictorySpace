@@ -18,32 +18,9 @@ public class VoterQueryController {
     public VoterQueryController(VoterQueryService voterQueryService){
         this.voterQueryService = voterQueryService;
     }
-    @GetMapping
-    public List<VoterQueryDTO> findAll(){
-        List<VoterQueryDTO> dtoList = voterQueryService.findAll();
-        return dtoList;
-    }
-    @GetMapping("/{id}")
-    public VoterQueryDTO findById(@PathVariable("id") int id){
-        VoterQueryDTO voterQueryDTO = voterQueryService.findById(id);
-        return voterQueryDTO;
-    }
 
     @GetMapping("/vote/{voteId}")
     public List<VoterListDTO> findByVoteId(@PathVariable("voteId") int voteId){
-        List<VoterListDTO> dtoList = voterQueryService.findByVoteId(voteId);
-        return dtoList;
-    }
-
-    @GetMapping("/member/{memberId}")
-    public List<VoterQueryDTO> findByMemberId(@PathVariable("memberId") int memberId){
-        List<VoterQueryDTO> dtoList = voterQueryService.findByMemberId(memberId);
-        return dtoList;
-    }
-
-    @GetMapping("/vote/{voteId}/member/{memberId}")
-    public VoterQueryDTO findByVoteAndMemberId(@PathVariable("voteId") int voteId,@PathVariable("memberId") int memberId){
-        VoterQueryDTO dto = voterQueryService.findByVoteAndMemberId(voteId, memberId);
-        return dto;
+        return voterQueryService.findByVoteId(voteId);
     }
 }

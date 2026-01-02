@@ -1,7 +1,6 @@
 package com.victoryspace.vics.voter.command.application.service;
 
 import com.victoryspace.vics.common.error.ErrorCode;
-import com.victoryspace.vics.voter.command.application.dto.VoterCommandDTO;
 import com.victoryspace.vics.voter.command.application.dto.request.VoterCreateRequestDTO;
 import com.victoryspace.vics.voter.command.application.dto.response.VoterCreateResponseDTO;
 import com.victoryspace.vics.voter.command.application.dto.response.VoterDeleteResponseDTO;
@@ -9,7 +8,6 @@ import com.victoryspace.vics.voter.command.application.mapper.VoterCommandMapper
 import com.victoryspace.vics.voter.command.domain.aggregate.VoterEntity;
 import com.victoryspace.vics.voter.command.domain.repository.VoterRepository;
 import com.victoryspace.vics.voter.exception.VoterException;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
