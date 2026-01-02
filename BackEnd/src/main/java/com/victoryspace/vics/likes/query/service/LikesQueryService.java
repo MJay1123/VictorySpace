@@ -1,6 +1,7 @@
 package com.victoryspace.vics.likes.query.service;
 
 import com.victoryspace.vics.likes.query.dto.LikesQueryDTO;
+import com.victoryspace.vics.likes.query.dto.response.LikesListDTO;
 
 import java.util.List;
 
@@ -9,7 +10,7 @@ public interface LikesQueryService {
 
     LikesQueryDTO findById(int id);
 
-    List<LikesQueryDTO> findByVoteId(int voteId);
+    List<LikesListDTO> findByVoteId(int voteId);
 
     List<LikesQueryDTO> findByMemberId(int memberId);
 

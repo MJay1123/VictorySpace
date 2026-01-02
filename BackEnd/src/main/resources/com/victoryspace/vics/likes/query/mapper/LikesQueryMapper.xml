@@ -12,6 +12,11 @@
         <result property="createdAt" column="created_at"/>
     </resultMap>
 
+    <resultMap id="LikesList"
+               type="com.victoryspace.vics.likes.query.dto.response.LikesListDTO">
+        <result property="memberNickname" column="member_nickname"/>
+    </resultMap>
+
     <select id="findAll" resultMap="LikesResultMap">
         SELECT id,
                vote_id,
@@ -29,13 +34,12 @@
         WHERE id = #{id}
     </select>
 
-    <select id="findByVoteId" resultMap="LikesResultMap">
-        SELECT id,
-               vote_id,
-               member_id,
-               created_at
-        FROM `likes`
-        WHERE vote_id = #{voteId}
+    <select id="findByVoteId" resultMap="LikesList">
+        SELECT
+            m.nickname as member_nickname
+        FROM `likes` l
+        JOIN member m ON l.member_id = m.id
+        WHERE l.vote_id = #{voteId}
     </select>
 
     <select id="findByMemberId" resultMap="LikesResultMap">

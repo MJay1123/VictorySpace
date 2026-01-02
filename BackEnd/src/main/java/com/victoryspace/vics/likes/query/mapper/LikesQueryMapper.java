@@ -1,6 +1,7 @@
 package com.victoryspace.vics.likes.query.mapper;
 
 import com.victoryspace.vics.likes.query.dto.LikesQueryDTO;
+import com.victoryspace.vics.likes.query.dto.response.LikesListDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -11,7 +12,7 @@ public interface LikesQueryMapper {
 
     LikesQueryDTO findById(int id);
 
-    List<LikesQueryDTO> findByVoteId(int voteId);
+    List<LikesListDTO> findByVoteId(int voteId);
 
     List<LikesQueryDTO> findByMemberId(int memberId);
 
