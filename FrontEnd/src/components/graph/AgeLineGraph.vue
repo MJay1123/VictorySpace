@@ -11,6 +11,7 @@
 
         <svg v-else viewBox="0 0 300 150" preserveAspectRatio="none" class="line-chart">
             <!-- 꺾은선 -->
+
             <polyline :points="linePoints" fill="none" stroke="#6366f1" stroke-width="2" />
 
             <!-- 점 + 숫자 -->
@@ -75,15 +76,29 @@ const xGap = computed(() =>
     (CHART_WIDTH - PADDING_X * 2) / (ageBuckets.length - 1)
 )
 
-/* -----------------------------
-   연령대 통계
-------------------------------*/
+const getAge = (birthday) => {
+    if (!birthday) return null
+
+    const birth = new Date(birthday)
+    const today = new Date()
+
+    let age = today.getFullYear() - birth.getFullYear()
+    const m = today.getMonth() - birth.getMonth()
+
+    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+        age--
+    }
+
+    return age
+}
+
 const ageStats = computed(() => {
     const result = {}
     ageBuckets.forEach(a => (result[a] = 0))
 
     props.voters.forEach(v => {
-        const age = v.age
+        const age = getAge(v.birthday)
+        if (age === null) return
 
         for (let i = ageBuckets.length - 1; i >= 0; i--) {
             if (age >= ageBuckets[i]) {
@@ -177,8 +192,8 @@ polyline {
 
 circle {
     transition: cx 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-                cy 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-                opacity 0.6s ease;
+        cy 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.6s ease;
 }
 
 g {

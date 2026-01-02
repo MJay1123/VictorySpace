@@ -7,13 +7,7 @@ export const commentApi = {
     
     /** ---------------------- Query API ---------------------- **/
 
-    findAll: () => http.get(`${BASE_URL}`),
-
-    findById: (id) => http.get(`${BASE_URL}/${id}`),
-
     findByVoteId: (voteId) => http.get(`${BASE_URL}/vote/${voteId}`),
-
-    findByMemberId: (memberId) => http.get(`${BASE_URL}/member/${memberId}`),
 
     /** ---------------------- Command API ---------------------- **/
 

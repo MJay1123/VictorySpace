@@ -44,7 +44,7 @@ const total = computed(() =>
 )
 
 const rate = (type) => {
-    return total.value ? Math.round((stats.value[type] / total.value) * 100) : 0
+    return total.value ? Math.round((stats.value[type] / total.value) * 100, 1) : 0
 }
 </script>
 

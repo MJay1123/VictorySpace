@@ -6,17 +6,8 @@ export const likesApi = {
 
     /** ---------------------- Query ---------------------- **/
 
-    // 전체 조회
-    findAll: () => http.get(`${BASE_URL}`),
-
-    // ID로 조회
-    findById: (id) => http.get(`${BASE_URL}/${id}`),
-
     // voteId로 조회
     findByVoteId: (voteId) => http.get(`${BASE_URL}/vote/${voteId}`),
-
-    // memberId로 조회
-    findByMemberId: (memberId) => http.get(`${BASE_URL}/member/${memberId}`),
 
 
     /** ---------------------- Command ---------------------- **/

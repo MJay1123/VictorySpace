@@ -60,7 +60,7 @@ const durationUnit = ref('h');
 const categories = ref([]);
 const selectedCategoryId = ref('');
 
-const user = JSON.parse(localStorage.getItem('userInfo'))
+const userId = JSON.parse(localStorage.getItem('userInfo')).id
 const emit = defineEmits(['created'])
 
 // 카테고리 불러오기
@@ -86,7 +86,7 @@ const createVote = async () => {
         title: title.value,
         categoryId: selectedCategoryId.value,
         content: content.value,
-        memberId: user.id,
+        memberId: userId,
         duration: duration
     };
 

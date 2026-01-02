@@ -11,22 +11,21 @@ export const memberApi = {
 
     findById: (id) => http.get(`${BASE_URL}/${id}`),
 
-    findByNickname: (nickname) =>
-        http.get(`${BASE_URL}/nickname`, {
-            params: { nickname }
-        }),
+    findByNickname: (nickname) => http.get(`${BASE_URL}/nickname`, {
+        params: { nickname }
+    }),
 
     // 이메일로 검색
-    findByEmail: (email) =>
-        http.get(`${BASE_URL}/email`, {
-            params: { email }
-        }),
+    findByEmail: (email) => http.get(`${BASE_URL}/email`, {
+        params: { email }
+    }),
 
     // 정렬 조회
-    order: (orderBy, direction) =>
-        http.get(`${BASE_URL}/order`, {
-            params: { orderBy, direction }
-        }),
+    order: (orderBy, direction) => http.get(`${BASE_URL}/order`, {
+        params: { orderBy, direction }
+    }),
+
+    orderRank: () => http.get(`${BASE_URL}/rank`),
 
     /** ---------------------- Command ---------------------- **/
 

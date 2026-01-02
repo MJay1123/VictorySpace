@@ -1,6 +1,6 @@
 <template>
     <section class="comment-section">
-        <h2 class="section-title">💬 댓글</h2>
+        <h2 class="section-title">💬 댓글 {{ comments.length }}</h2>
 
         <div class="comment-form">
             <textarea v-model="content" placeholder="댓글을 입력하세요" rows="3" />
@@ -10,21 +10,12 @@
 
         <div class="comment-list">
             <div v-for="comment in comments" :key="comment.id" class="comment-item">
-                <!-- 수정 모달 -->
-                <UpdateCommentModal 
-                    v-if="editingCommentId === comment.id" 
-                    :comment="comment" 
-                    @close="editingCommentId = null"
-                    @updated="handleUpdate" 
-                />
 
-                <!-- 삭제 모달 -->
-                <DeleteCommentModal 
-                    v-if="deletingCommentId === comment.id" 
-                    :commentId="comment.id" 
-                    @close="deletingCommentId = null"
-                    @deleted="handleDelete" 
-                />
+                <UpdateCommentModal v-if="editingCommentId === comment.id" :comment="comment"
+                    @close="editingCommentId = null" @updated="handleUpdate" />
+
+                <DeleteCommentModal v-if="deletingCommentId === comment.id" :commentId="comment.id"
+                    @close="deletingCommentId = null" @deleted="handleDelete" />
 
                 <div class="comment-header">
                     <div class="meta">
@@ -36,13 +27,10 @@
                             }}
                         </span>
                     </div>
-                    
+
                     <!-- 액션 메뉴 -->
-                    <CommentActionMenu 
-                        v-if="comment.canEdit" 
-                        @edit="openUpdateModal(comment.id)"
-                        @delete="openDeleteModal(comment.id)"
-                    />
+                    <CommentActionMenu v-if="comment.memberId === userId" @edit="openUpdateModal(comment.id)"
+                        @delete="openDeleteModal(comment.id)" />
                 </div>
                 <p class="content">{{ comment.content }}</p>
             </div>
@@ -61,21 +49,14 @@ import CommentActionMenu from './CommentActionMenu.vue'
 import UpdateCommentModal from './UpdateCommentModal.vue'
 import DeleteCommentModal from './DeleteCommentModal.vue'
 
-const user = computed(() => {
-    try {
-        return JSON.parse(localStorage.getItem('userInfo'))
-    } catch {
-        console.log("유저 정보 로딩 실패")
-        return null
-    }
-})
-
 const props = defineProps({
     voteId: {
         type: Number,
         required: true,
     },
 })
+
+const userId = JSON.parse(localStorage.getItem('userInfo')).id
 
 const comments = ref([])
 const content = ref('')
@@ -98,7 +79,7 @@ const submitComment = async () => {
     try {
         await commentApi.createComment({
             voteId: props.voteId,
-            memberId: user.value.id,
+            memberId: userId,
             content: content.value,
         })
         content.value = ''

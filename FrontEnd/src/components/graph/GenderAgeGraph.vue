@@ -92,6 +92,22 @@ const xGap = computed(() =>
     (CHART_WIDTH - PADDING_X * 2) / (ageBuckets.length - 1)
 )
 
+const getAge = (birthday) => {
+    if (!birthday) return null
+
+    const birth = new Date(birthday)
+    const today = new Date()
+
+    let age = today.getFullYear() - birth.getFullYear()
+    const m = today.getMonth() - birth.getMonth()
+
+    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+        age--
+    }
+
+    return age
+}
+
 const ageGenderStats = computed(() => {
     const result = {}
     ageBuckets.forEach(a => {
@@ -99,7 +115,7 @@ const ageGenderStats = computed(() => {
     })
 
     props.voters.forEach(v => {
-        const age = v.age
+        const age = getAge(v.birthday)
         const gender = v.gender
 
         for (let i = ageBuckets.length - 1; i >= 0; i--) {
