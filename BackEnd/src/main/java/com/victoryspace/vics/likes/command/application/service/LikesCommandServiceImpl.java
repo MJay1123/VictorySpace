@@ -1,7 +1,6 @@
 package com.victoryspace.vics.likes.command.application.service;
 
 import com.victoryspace.vics.common.error.ErrorCode;
-import com.victoryspace.vics.likes.command.application.dto.LikesCommandDTO;
 import com.victoryspace.vics.likes.command.application.dto.request.LikesCreateRequestDTO;
 import com.victoryspace.vics.likes.command.application.dto.response.LikesCreateResponseDTO;
 import com.victoryspace.vics.likes.command.application.dto.response.LikesDeleteResponseDTO;
@@ -10,11 +9,8 @@ import com.victoryspace.vics.likes.command.domain.aggregate.LikesEntity;
 import com.victoryspace.vics.likes.command.domain.repository.LikesRepository;
 import com.victoryspace.vics.likes.exception.LikesException;
 import com.victoryspace.vics.vote.exception.VoteException;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
