@@ -1,6 +1,7 @@
 package com.victoryspace.vics.likes.query.controller;
 
 import com.victoryspace.vics.likes.query.dto.LikesQueryDTO;
+import com.victoryspace.vics.likes.query.dto.response.LikesListDTO;
 import com.victoryspace.vics.likes.query.service.LikesQueryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,9 +32,8 @@ public class LikesQueryController {
         return dto;
     }
     @GetMapping("vote/{voteId}")
-    public List<LikesQueryDTO> findByVoteId(@PathVariable("voteId") int voteId){
-        List<LikesQueryDTO> dtoList = queryService.findByVoteId(voteId);
-        return dtoList;
+    public List<LikesListDTO> findByVoteId(@PathVariable("voteId") int voteId){
+        return queryService.findByVoteId(voteId);
     }
     @GetMapping("member/{memberId}")
     public List<LikesQueryDTO> findByMemberId(@PathVariable("memberId") int memberId){

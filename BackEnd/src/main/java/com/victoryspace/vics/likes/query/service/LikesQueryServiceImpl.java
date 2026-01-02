@@ -1,6 +1,7 @@
 package com.victoryspace.vics.likes.query.service;
 
 import com.victoryspace.vics.likes.query.dto.LikesQueryDTO;
+import com.victoryspace.vics.likes.query.dto.response.LikesListDTO;
 import com.victoryspace.vics.likes.query.mapper.LikesQueryMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,9 +26,8 @@ public class LikesQueryServiceImpl implements LikesQueryService {
     }
 
     @Override
-    public List<LikesQueryDTO> findByVoteId(int voteId) {
-        List<LikesQueryDTO> dtoList = mapper.findByVoteId(voteId);
-        return dtoList;
+    public List<LikesListDTO> findByVoteId(int voteId) {
+        return mapper.findByVoteId(voteId);
     }
 
     @Override
