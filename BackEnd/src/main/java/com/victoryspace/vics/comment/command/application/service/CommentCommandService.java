@@ -1,6 +1,5 @@
 package com.victoryspace.vics.comment.command.application.service;
 
-import com.victoryspace.vics.comment.command.application.dto.CommentCommandDTO;
 import com.victoryspace.vics.comment.command.application.dto.request.CommentCreateRequestDTO;
 import com.victoryspace.vics.comment.command.application.dto.request.CommentUpdateRequestDTO;
 import com.victoryspace.vics.comment.command.application.dto.response.CommentCreateResponseDTO;

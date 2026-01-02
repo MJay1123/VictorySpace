@@ -1,6 +1,5 @@
 package com.victoryspace.vics.comment.command.application.service;
 
-import com.victoryspace.vics.comment.command.application.dto.CommentCommandDTO;
 import com.victoryspace.vics.comment.command.application.dto.request.CommentCreateRequestDTO;
 import com.victoryspace.vics.comment.command.application.dto.request.CommentUpdateRequestDTO;
 import com.victoryspace.vics.comment.command.application.dto.response.CommentCreateResponseDTO;
@@ -11,11 +10,8 @@ import com.victoryspace.vics.comment.command.domain.aggregate.CommentEntity;
 import com.victoryspace.vics.comment.command.domain.repository.CommentRepository;
 import com.victoryspace.vics.comment.exception.CommentException;
 import com.victoryspace.vics.common.error.ErrorCode;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor

@@ -9,9 +9,9 @@ import java.time.LocalDateTime;
 @Builder
 public class VoteCommentResponseDTO {
     private Integer id;
+    private Integer memberId;
     private String memberNickname;
     private String content;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private Boolean canEdit;
 }
