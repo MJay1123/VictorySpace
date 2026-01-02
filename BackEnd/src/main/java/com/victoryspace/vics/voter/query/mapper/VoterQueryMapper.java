@@ -8,13 +8,7 @@ import java.util.List;
 
 @Mapper
 public interface VoterQueryMapper {
-    List<VoterQueryDTO> findAll();
-
-    VoterQueryDTO findById(int id);
 
     List<VoterListDTO> findByVoteId(int voteId);
 
-    List<VoterQueryDTO> findByMemberId(int memberId);
-
-    VoterQueryDTO findByVoteAndMemberId(int voteId, int memberId);
 }
