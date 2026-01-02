@@ -71,6 +71,16 @@
                 </div>
             </div>
 
+            <div class="likes-bar">
+                <button class="like-btn" :class="{ liked: isLiked }" @click="toggleLike">
+                    ❤️
+                </button>
+
+                <span class="likes-number" @click="showLikesModal = true">
+                    {{ likes.length }}
+                </span>
+            </div>
+
             <!-- NEUTRAL -->
             <div class="neutral-section">
                 <div class="side neutral" :class="{ selected: userVote?.content === 'neutral' }">
@@ -104,20 +114,25 @@
 
         <DeleteVoteModal v-if="showDeleteModal" :voteId="vote.id" @close="showDeleteModal = false"
             @deleted="handleDeleted" />
+
+        <LikesListModal v-if="showLikesModal" :voteId="vote.id" @close="showLikesModal = false" />
     </section>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 
 import VoteActionMenu from './VoteActionMenu.vue'
 import UpdateVoteModal from './UpdateVoteModal.vue'
 import DeleteVoteModal from './DeleteVoteModal.vue'
 import VotersGraphModal from './VotersGraphModal.vue'
+import LikesListModal from './LikesListModal.vue'
 
 import voteApi from '@/api/voteApi'
 import voterApi from '../../api/voterApi'
+import likesApi from '../../api/likesApi'
+import memberApi from '../../api/memberApi'
 
 const router = useRouter()
 const props = defineProps({
@@ -131,19 +146,86 @@ const vote = ref({})
 const userVote = ref(null)
 const selectedOption = ref(null)
 const challengerContent = ref('')
+const likes = ref([])
+const isLiked = ref(false)
+const showLikesModal = ref(false)
+const myLike = ref(null)
+const user = ref(null)
+const userId = JSON.parse(localStorage.getItem('userInfo')).id
+const canEdit = computed(() =>
+    userId === vote.value.memberId && !vote.value.challengerNickname
+)
 
-const user = computed(() => {
+const fetchUser = async () => {
     try {
-        return JSON.parse(localStorage.getItem('userInfo'))
+        const res = await memberApi.findById(userId)
+        user.value = res.data
+        console.log('user.value:', user.value)
     } catch {
         console.log("유저 정보 로딩 실패")
-        return null
+        user.value = null
     }
-})
+}
 
-const canEdit = computed(() =>
-    user && user.id === vote.value.memberId && !vote.value.challengerId
-)
+const fetchVote = async () => {
+    const res = await voteApi.findById(props.voteId)
+    vote.value = res.data
+
+    if (user.value) {
+        try {
+            const uv = await voterApi.findByVoteAndMemberId(props.voteId, userId)
+            userVote.value = uv.data
+            selectedOption.value = uv.data?.content || null
+        } catch {
+            userVote.value = null
+        }
+    }
+}
+
+const fetchLikes = async () => {
+    try {
+        const res = await likesApi.findByVoteId(props.voteId)
+        likes.value = res.data
+    } catch (e) {
+        console.log('좋아요 조회 실패', e)
+    }
+}
+
+const fetchMyLike = async () => {
+    try {
+        const res = await likesApi.findByMemberId(userId)
+
+        myLike.value = res.data.find(
+            like => like.voteId === vote.value.id
+        ) || null
+
+        isLiked.value = !!myLike.value
+    } catch (e) {
+        console.error('내 좋아요 조회 실패', e)
+    }
+}
+
+const toggleLike = async () => {
+    try {
+        if (!isLiked.value) {
+            // 👍 좋아요 추가
+            const likesDTO = {
+                voteId: vote.value.id,
+                memberId: userId
+            }
+            await likesApi.createLike(likesDTO)
+        } else {
+            // 👎 좋아요 취소 (내 like id로 삭제)
+            if (!myLike.value) return
+
+            await likesApi.deleteLike(myLike.value.id)
+        }
+
+        await refresh()
+    } catch (e) {
+        console.error('좋아요 처리 실패', e)
+    }
+}
 
 const showGraphModal = ref(false)
 const showUpdateModal = ref(false)
@@ -153,24 +235,16 @@ const openUpdate = () => (showUpdateModal.value = true)
 const openDelete = () => (showDeleteModal.value = true)
 
 const refresh = async () => {
-    const { data } = await voteApi.findById(props.voteId)
-    vote.value = data
-
-    if (user.value) {
-        try {
-            const uv = await voterApi.findByVoteAndMemberId(props.voteId, user.value.id)
-            userVote.value = uv.data
-            selectedOption.value = uv.data?.content || null
-        } catch {
-            userVote.value = null
-        }
-    }
+    await fetchUser()
+    await fetchVote()
+    await fetchLikes()
+    await fetchMyLike()
 }
 
 const handleVote = async content => {
     await voterApi.createVoter({
         voteId: props.voteId,
-        memberId: user.value.id,
+        memberId: userId,
         content
     })
     refresh()
@@ -186,9 +260,8 @@ const challengeVote = async () => {
         alert('도전자 내용을 입력해주세요')
         return
     }
-
     await voteApi.challengeVote(vote.value.id, {
-        challengerId: user.value.id,
+        challengerId: userId,
         challengerContent: challengerContent.value
     })
 
@@ -531,5 +604,55 @@ onMounted(refresh)
     color: #4338ca;
     font-weight: 600;
     cursor: pointer;
+}
+
+.likes-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    margin: 1.2rem 0;
+}
+
+.like-btn {
+    font-size: 1.6rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.like-btn:hover {
+    transform: scale(1.2);
+    filter: brightness(1.2);
+}
+
+.like-btn.liked {
+    animation: pop 0.25s ease;
+}
+
+.likes-number {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #e0245e;
+    cursor: pointer;
+}
+
+.likes-number:hover {
+    text-decoration: underline;
+}
+
+@keyframes pop {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.4);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 </style>
