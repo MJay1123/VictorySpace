@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 public class VoteCreateRequestDTO {
     private String title;
     private Integer categoryId;
-    private String content;
     private Integer memberId;
+    private String content;
     private String duration;
 }

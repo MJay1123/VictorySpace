@@ -6,7 +6,7 @@
 <mapper namespace="com.victoryspace.vics.comment.query.mapper.CommentQueryMapper">
     <resultMap id="CommentResultMap"
                type="com.victoryspace.vics.comment.query.dto.CommentQueryDTO">
-        <result property="id" column="id"/>
+        <id property="id" column="id"/>
         <result property="voteId" column="vote_id"/>
         <result property="memberId" column="member_id"/>
         <result property="content" column="content"/>
@@ -17,7 +17,7 @@
 
     <resultMap id="VoteCommentDTO"
                type="com.victoryspace.vics.comment.query.dto.response.VoteCommentDTO">
-        <result property="id" column="id"/>
+        <id property="id" column="id"/>
         <result property="memberNickname" column="member_nickname"/>
         <result property="content" column="content"/>
         <result property="createdAt" column="created_at"/>
@@ -27,7 +27,7 @@
 
     <resultMap id="VoteCommentResponse"
                type="com.victoryspace.vics.comment.query.dto.response.VoteCommentResponseDTO">
-        <result property="id" column="id"/>
+        <id property="id" column="id"/>
         <result property="memberNickname" column="member_nickname"/>
         <result property="content" column="content"/>
         <result property="createdAt" column="created_at"/>

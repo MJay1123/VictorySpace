@@ -2,7 +2,6 @@ package com.victoryspace.vics.vote.query.service;
 
 import com.victoryspace.vics.common.error.ErrorCode;
 import com.victoryspace.vics.vote.exception.VoteException;
-import com.victoryspace.vics.vote.query.dto.response.VoteQueryCountDTO;
 import com.victoryspace.vics.vote.query.dto.response.VoteQueryDetailResponseDTO;
 import com.victoryspace.vics.vote.query.dto.request.VoteSearchDTO;
 import com.victoryspace.vics.vote.query.dto.response.VoteQueryListResponseDTO;
