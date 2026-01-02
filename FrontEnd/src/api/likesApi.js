@@ -27,3 +27,5 @@ export const likesApi = {
     // 좋아요 삭제
     deleteLike: (id) => http.delete(`${BASE_URL}/${id}`)
 };
+
+export default likesApi
