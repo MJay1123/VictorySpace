@@ -13,12 +13,18 @@
               <span class="grade">
                 {{ user?.gradeSymbol }} {{ user?.gradeName }}
               </span>
-              <span class="point"> Point :  {{ user?.point }} </span>
+              <span class="point"> Point : {{ user?.point }} </span>
             </div>
 
             <p class="nickname">@{{ user?.nickname }}</p>
             <p class="email">{{ user?.email }}</p>
           </div>
+
+          <button class="rank-btn" @click="showRankModal = true">
+            🏆 전체 랭킹
+          </button>
+
+          <RankModal v-if="showRankModal" @close="showRankModal = false" />
         </div>
 
         <div class="info-content">
@@ -75,6 +81,7 @@ import { useRouter } from 'vue-router'
 import voteApi from '../api/voteApi'
 import memberApi from '../api/memberApi'
 import logo2 from '../assets/images/logo2.png'
+import RankModal from '../components/member/RankModal.vue'
 
 const router = useRouter()
 
@@ -106,6 +113,7 @@ const createdVotes = ref([])
 const challengedVotes = ref([])
 const isLoadingCreated = ref(false)
 const isLoadingChallenged = ref(false)
+const showRankModal = ref(false)
 
 const fetchUserInfo = async () => {
   if (!userId.value) return
@@ -258,6 +266,21 @@ onMounted(async () => {
 .email {
   font-size: 1.3rem;
   color: #888;
+}
+
+.rank-btn {
+  background: linear-gradient(135deg, #ffd700, #ffb703);
+  border: none;
+  border-radius: 999px;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.rank-btn:hover {
+  opacity: 0.9;
 }
 
 .info-content {
